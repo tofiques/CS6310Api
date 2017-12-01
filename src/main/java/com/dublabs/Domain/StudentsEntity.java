@@ -6,13 +6,24 @@ import javax.persistence.*;
  * Created by tofiques on 11/30/17.
  */
 @Entity
-@Table(name = "students", schema = "csassignment", catalog = "")
+@Table(name = "students", schema = "csassignment")
 public class StudentsEntity {
     private int studentId;
     private String studentName;
     private String studentAddr;
     private String studentPhone;
     private Integer programId;
+
+    public StudentsEntity(int studentId, String studentName, String studentAddr, String studentPhone, Integer programId) {
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.studentAddr = studentAddr;
+        this.studentPhone = studentPhone;
+        this.programId = programId;
+    }
+
+    public StudentsEntity() {
+    }
 
     @Id
     @Column(name = "student_id")

@@ -3,22 +3,29 @@ package com.dublabs.Domain;
 import javax.persistence.*;
 
 /**
- * Created by tofiques on 11/30/17.
+ * Created by tofiques on 12/1/17.
  */
 @Entity
 @Table(name = "programs", schema = "csassignment", catalog = "")
 public class ProgramsEntity {
-    private Integer programId;
+    private int programId;
     private String programTitle;
 
-    @Basic
+    public ProgramsEntity() {
+    }
+
+    public ProgramsEntity(int programId, String programTitle) {
+        this.programId = programId;
+        this.programTitle = programTitle;
+    }
+
     @Id
     @Column(name = "program_id")
-    public Integer getProgramId() {
+    public int getProgramId() {
         return programId;
     }
 
-    public void setProgramId(Integer programId) {
+    public void setProgramId(int programId) {
         this.programId = programId;
     }
 
@@ -39,7 +46,7 @@ public class ProgramsEntity {
 
         ProgramsEntity that = (ProgramsEntity) o;
 
-        if (programId != null ? !programId.equals(that.programId) : that.programId != null) return false;
+        if (programId != that.programId) return false;
         if (programTitle != null ? !programTitle.equals(that.programTitle) : that.programTitle != null) return false;
 
         return true;
@@ -47,7 +54,7 @@ public class ProgramsEntity {
 
     @Override
     public int hashCode() {
-        int result = programId != null ? programId.hashCode() : 0;
+        int result = programId;
         result = 31 * result + (programTitle != null ? programTitle.hashCode() : 0);
         return result;
     }

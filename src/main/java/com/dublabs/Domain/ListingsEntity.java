@@ -1,18 +1,24 @@
 package com.dublabs.Domain;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
- * Created by tofiques on 11/30/17.
+ * Created by tofiques on 12/1/17.
  */
-
+@Entity
 @Table(name = "listings", schema = "csassignment", catalog = "")
 public class ListingsEntity {
     private Integer programId;
-    private Integer courseId;
+    private Integer ourseId;
+    private int id;
+
+    public ListingsEntity() {
+    }
+
+    public ListingsEntity(Integer programId, Integer ourseId) {
+        this.programId = programId;
+        this.ourseId = ourseId;
+    }
 
     @Basic
     @Column(name = "program_id")
@@ -25,13 +31,24 @@ public class ListingsEntity {
     }
 
     @Basic
-    @Column(name = "course_id")
-    public Integer getCourseId() {
-        return courseId;
+    @Column(name = "ourse_id")
+    public Integer getOurseId() {
+        return ourseId;
     }
 
-    public void setCourseId(Integer courseId) {
-        this.courseId = courseId;
+    public void setOurseId(Integer ourseId) {
+        this.ourseId = ourseId;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -41,8 +58,9 @@ public class ListingsEntity {
 
         ListingsEntity that = (ListingsEntity) o;
 
+        if (id != that.id) return false;
         if (programId != null ? !programId.equals(that.programId) : that.programId != null) return false;
-        if (courseId != null ? !courseId.equals(that.courseId) : that.courseId != null) return false;
+        if (ourseId != null ? !ourseId.equals(that.ourseId) : that.ourseId != null) return false;
 
         return true;
     }
@@ -50,7 +68,8 @@ public class ListingsEntity {
     @Override
     public int hashCode() {
         int result = programId != null ? programId.hashCode() : 0;
-        result = 31 * result + (courseId != null ? courseId.hashCode() : 0);
+        result = 31 * result + (ourseId != null ? ourseId.hashCode() : 0);
+        result = 31 * result + id;
         return result;
     }
 }

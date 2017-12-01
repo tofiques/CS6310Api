@@ -1,19 +1,17 @@
 package com.dublabs.Domain;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
- * Created by tofiques on 11/30/17.
+ * Created by tofiques on 12/1/17.
  */
-
+@Entity
 @Table(name = "academic_records", schema = "csassignment", catalog = "")
 public class AcademicRecordsEntity {
     private String studentGrade;
     private Integer courseYear;
     private Integer couesTerm;
+    private int id;
 
     @Basic
     @Column(name = "student_grade")
@@ -45,6 +43,17 @@ public class AcademicRecordsEntity {
         this.couesTerm = couesTerm;
     }
 
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,6 +61,7 @@ public class AcademicRecordsEntity {
 
         AcademicRecordsEntity that = (AcademicRecordsEntity) o;
 
+        if (id != that.id) return false;
         if (studentGrade != null ? !studentGrade.equals(that.studentGrade) : that.studentGrade != null) return false;
         if (courseYear != null ? !courseYear.equals(that.courseYear) : that.courseYear != null) return false;
         if (couesTerm != null ? !couesTerm.equals(that.couesTerm) : that.couesTerm != null) return false;
@@ -64,6 +74,7 @@ public class AcademicRecordsEntity {
         int result = studentGrade != null ? studentGrade.hashCode() : 0;
         result = 31 * result + (courseYear != null ? courseYear.hashCode() : 0);
         result = 31 * result + (couesTerm != null ? couesTerm.hashCode() : 0);
+        result = 31 * result + id;
         return result;
     }
 }

@@ -1,7 +1,6 @@
 package com.dublabs.Domain;
 
-import com.dublabs.Repository.AcademicRecordsEntityRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -33,26 +32,23 @@ public class Scratchpad {
                 instructors.add(instructor);
                 break;
             case "listings.csv":
-               // listings.computeIfAbsent(Integer.valueOf(tokens[0]), k -> new ArrayList<>()).add(Integer.valueOf(tokens[1]));
+                ListingsEntity listingsEntity=new ListingsEntity(Integer.valueOf(tokens[0]),Integer.valueOf(tokens[1]));
+                listingsEntities.add(listingsEntity);
+
                 break;
             case "prereqs.csv":
-                //prereqs.computeIfAbsent(Integer.valueOf(tokens[0]), k -> new ArrayList<>()).add(Integer.valueOf(tokens[1]));
+               PrereqsEntity prereqsEntity= new PrereqsEntity(Integer.valueOf(tokens[0]),Integer.valueOf(tokens[1]));
+               prereqsEntities.add(prereqsEntity);
                 break;
             case "programs.csv":
-               // DegreeProgram degreeProgram = new DegreeProgram(Integer.valueOf(tokens[0]), tokens[1]);
-                //degreePrograms.add(degreeProgram);
+                ProgramsEntity degreeProgram = new ProgramsEntity(Integer.valueOf(tokens[0]), tokens[1]);
+                degreePrograms.add(degreeProgram);
                 break;
-            case "records.csv":
-               // Record record = new Record(Integer.valueOf(tokens[0]), Integer.valueOf(tokens[1]), tokens[2], Integer.valueOf(tokens[3]), Integer.valueOf(tokens[4]));
-               // records.add(record);
-                break;
-            case "requests.csv":
-                //Request request = new Request(Integer.valueOf(tokens[0]), Integer.valueOf(tokens[1]));
-                //requests.add(request);
-                break;
+
+
             case "students.csv":
-              //  Student stu = new Student(Integer.valueOf(tokens[0]), tokens[1], tokens[2], tokens[3], Integer.valueOf(tokens[4]));
-               // students.add(stu);
+               StudentsEntity stu = new StudentsEntity(Integer.valueOf(tokens[0]), tokens[1], tokens[2], tokens[3], Integer.valueOf(tokens[4]));
+               students.add(stu);
                 break;
             default:
                 System.out.println("# error: unknown input file name");
@@ -98,5 +94,21 @@ public class Scratchpad {
 
     public ArrayList<InstructorsEntity> getInstructors() {
         return instructors;
+    }
+
+    public ArrayList<StudentsEntity> getStudents() {
+        return students;
+    }
+
+    public ArrayList<PrereqsEntity> getPrereqsEntities() {
+        return prereqsEntities;
+    }
+
+    public ArrayList<ProgramsEntity> getDegreePrograms() {
+        return degreePrograms;
+    }
+
+    public ArrayList<ListingsEntity> getListingsEntities() {
+        return listingsEntities;
     }
 }

@@ -1,6 +1,6 @@
 package com.dublabs.Domain;
 
-import org.springframework.http.RequestEntity;
+
 
 import java.util.List;
 
@@ -9,13 +9,13 @@ import java.util.List;
  */
 public class Requests {
 
-    List<RequestEntity> requests;
+    List<RequestsEntity> requests;
 
-  public List<RequestEntity> getRequests() {
+  public List<RequestsEntity> getRequests() {
     return requests;
   }
 
-  public void setRequests(List<RequestEntity> requests) {
+  public void setRequests(List<RequestsEntity> requests) {
     this.requests = requests;
   }
 }
