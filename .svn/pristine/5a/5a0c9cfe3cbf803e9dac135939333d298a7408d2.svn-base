@@ -1,0 +1,246 @@
+package com.dublabs.Controllers;
+
+import com.dublabs.Domain.BannerDomain;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
+import java.sql.*;
+
+/**
+ * Created by tofiques on 4/11/17.
+ */
+
+@Controller
+public class BannerController {
+    @RequestMapping(value = "/bannerSis", method = RequestMethod.GET)
+    protected ModelAndView bannerSis() {
+        ModelAndView model = new ModelAndView();
+        BannerDomain banner = new BannerDomain();
+        model.addObject("bannerObject", banner);
+        model.addObject("prettyJson", "");
+        model.addObject("jdbc", "");
+        model.setViewName("bannerSis");
+        return model;
+    }
+
+
+    @RequestMapping(value = "/submitBannerSis", method = RequestMethod.POST)
+    protected ModelAndView banner(@Valid @ModelAttribute BannerDomain
+                                          bannerObject, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        StringBuffer sb = new StringBuffer();
+        String[] coursesTable = new String[]{"GOBTPAC", "GOREMAL", "SIRASGN", "SPRIDEN", "SPBPERS",
+                "SFRSTCR", "SCBCRSE", "SSBSECT", "SSRMEET", "STVCAMP", "STVBLDG", "STVTERM", "STVSUBJ", "SHRTCKN", "SHRTCKG",
+                "STVRSTS", "SSRTEXT"};
+        String[] holdTable = new String[]{"SPRHOLD", "RORHOLD", "RTVHOLD", "STVHLDD", "STVORIG"};
+        String[] bursarTable = new String[]{"Dub_Bursar"};
+        String[] courseCatalogTable = new String[]{"SCBCRSE", "SCBDESC", "STVSUBJ", "STVTERM", "STVDEPT", "STVBLDG",
+                "STVCOLL", "SSBSECT", "SSRMEET"};
+        String[] enrollmentSelectTable = new String[]{"GOBTPAC", "GOREMAL", "GTVSDAX", "SCBCRSE", "SCBDESC",
+                "SCRLEVL", "SCRATTR", "SCRGMOD", "SFBETRM", "SFRRACL", "SFRSTCR", "SFTREGS", "SGBSTDN", "SIRASGN", "SOBTERM",
+                "SOBWLTC", "SORRTRM", "SPRIDEN", "SSBSECT", "SSRMEET", "SSRRATT", "SSRRLVL", "SSRTEXT", "STVBLDG", "STVCAMP",
+                "STVRSTS", "STVSSTS", "STVSUBJ", "STVTERM", "TWGRMENU", "SFRMHRS", "SFBRGRP", "SSRLINK", "SFRWCTL", "SFBWCTL",
+                "SFRRSTS", "SFRCTRL", "SSBXLST", "SSRXLST", "SPRHOLD", "RORHOLD", "STVHLDD", "STVSTST", "STVASTD", "STVORIG",
+                "STVSCHD", "SHRTTRM", "STVCAST", "SSRCORQ", "SCRCORQ", "SCRRATT", "STVESTS", "STVGMOD"};
+        String[] finAidSelect = new String[]{"RFRBASE", "RPRAWRD", "RFRASPC", "RTVAWST", "STVTERM", "RORSTAT", "ROBINST", "RFRASPC"};
+        String[] enrollmentExecute = new String[]{"BWCKLIBS", "SFKCURS", "SFKEDIT", "SFKMODS",
+                "SFKFUNC", "SFKRCTL", "SFKPREQ", "SFKFEES", "SOKTABS", "SFKWLAT", "SFKWAIT", "SFKSELS", "SB_WL_NOTIFICATION",
+                "RP_AWARD"};
+        String[] finAidExecute = new String[]{"RFRBASE", "RPRAWRD", "RFRASPC", "RTVAWST", "STVTERM", "RORSTAT", "ROBINST", "RFRASPC"};
+        String[] authenticate = new String[]{"GOBTPAC"};
+
+        String queryFormat = "select PRIVILEGE from ALL_TAB_PRIVS_RECD where TABLE_NAME='%s'";
+
+
+        String jdbcUrl = getJDBCUrl(bannerObject.getUrl(), bannerObject.getPort(), bannerObject.getSid(), bannerObject.getUserName(), bannerObject.getPassword());
+        model.addObject("jdbc", jdbcUrl);
+        String sqlselect = "select count(*) from %s";
+        if (bannerObject.getCourses()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, coursesTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Courses are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getEnrollment()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, enrollmentSelectTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Enrollment are available with Select Permission \n");
+            } else {
+                sb.append(errormessage);
+            }
+            String errormessageExec = getTablesBannerExecute(jdbcUrl, queryFormat, enrollmentExecute);
+            if (errormessageExec.isEmpty()) {
+                sb.append("All tables for Enrollment are available with Execute Permission \n");
+            } else {
+                sb.append(errormessageExec);
+            }
+        }
+        if (bannerObject.getFinAid()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, finAidSelect);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Financial Aid are available with Select Permission \n");
+            } else {
+                sb.append(errormessage);
+            }
+            String errormessageExec = getTablesBannerExecute(jdbcUrl, queryFormat, finAidExecute);
+            if (errormessageExec.isEmpty()) {
+                sb.append("All tables for Financial Aid are available with Execute Permission \n");
+            } else {
+                sb.append(errormessageExec);
+            }
+        }
+        if (bannerObject.getBursar()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, bursarTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Bursar are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getHolds()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, holdTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Holds are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getCourseCatalog()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, courseCatalogTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Course Catalog are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getAuthenticate()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, authenticate);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Authentication are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        model.addObject("prettyJson", sb.toString());
+        model.addObject("bannerObject", bannerObject);
+
+        model.setViewName("bannerSis");
+        return model;
+    }
+
+
+    protected String getTablesBanner(String jdbcUrl, String sql, String[] tables) {
+        Connection connection = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        StringBuffer sb = new StringBuffer();
+        try {
+
+            connection = DriverManager.getConnection(
+                    jdbcUrl, "sc_mobile_user", "kLj+s4IJkgf89$fF");
+            if (connection != null) {
+
+
+                for (String table : tables) {
+                    try {
+                        stmt = connection.createStatement();
+                        rs = stmt.executeQuery(String.format(sql, table));
+                        while (rs.next()) {
+                            int count = rs.getInt("count(*)");
+                            // System.out.println(table + " count"  + count);
+                        }
+                    } catch (SQLException sqle) {
+                        sb.append(table + " " + sqle.getMessage());
+
+                    }
+
+                }
+                connection.close();
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+
+        } catch (SQLException e) {
+
+
+            e.printStackTrace();
+
+
+        }
+        return sb.toString();
+    }
+
+    protected String getTablesBannerExecute(String jdbcUrl, String sql, String[] tables) {
+        Connection connection = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        StringBuffer sb = new StringBuffer();
+        try {
+
+            connection = DriverManager.getConnection(
+                    jdbcUrl, "sc_mobile_user", "kLj+s4IJkgf89$fF");
+            if (connection != null) {
+
+
+                for (String table : tables) {
+                    try {
+                        stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+                        rs = stmt.executeQuery(String.format(sql, table));
+                        if (rs.next()) {
+                            rs.beforeFirst();
+                            while (rs.next()) {
+                                String privilege = rs.getString("PRIVILEGE");
+                                if (!privilege.equals("EXECUTE")) {
+                                    sb.append(table + " :no execute permission" + "\n");
+                                }
+                            }
+                        } else {
+                            sb.append(table + " :no execute permission" + "\n");
+                        }
+                    } catch (SQLException sqle) {
+                        sb.append(table + " " + sqle.getMessage() + "\n");
+
+                    }
+
+                }
+                connection.close();
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+
+        } catch (SQLException e) {
+
+
+            e.printStackTrace();
+
+
+        }
+        return sb.toString();
+    }
+    private String getJDBCUrl(String url, String port, String sid, String userName, String password) {
+        String urlOne = String.format("jdbc:oracle:thin:@%s:%s:%s", url, port, sid);
+        String urlTwo = String.format("jdbc:oracle:thin:@//%s:%s/%s", url, port, sid);
+        String[] connectionString = {urlTwo, urlOne};
+        Connection connection = null;
+        for (String jdbcurl : connectionString) {
+            try {
+                connection = DriverManager.getConnection(jdbcurl, userName, password);
+                if (connection != null) {
+                    connection.close();
+                    return jdbcurl;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return "Can not connect";
+    }
+}

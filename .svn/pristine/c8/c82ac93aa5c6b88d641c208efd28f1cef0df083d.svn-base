@@ -1,0 +1,72 @@
+package com.dublabs.Domain;
+
+/**
+ * Created by tofiques on 3/27/17.
+ */
+public class D2L {
+
+    private  String url;
+    private String appKey;
+    private String appId;
+    private String userId;
+    private String userKey;
+    private String port;
+    private Boolean d2lAuth;
+
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserKey() {
+        return userKey;
+    }
+
+    public void setUserKey(String userKey) {
+        this.userKey = userKey;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public Boolean getD2lAuth() {
+        return d2lAuth;
+    }
+
+    public void setD2lAuth(Boolean d2lAuth) {
+        this.d2lAuth = d2lAuth;
+    }
+}

@@ -1,0 +1,77 @@
+package com.dublabs.Controllers;
+
+import com.dublabs.Domain.Canvas;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import org.apache.http.client.fluent.Content;
+import org.apache.http.client.fluent.Request;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
+import java.io.IOException;
+
+/**
+ * Created by tofiques on 4/11/17.
+ */
+
+@Controller
+public class CanvasController {
+
+    @RequestMapping(value = "/canvas", method = RequestMethod.GET)
+    protected ModelAndView canvas() {
+        ModelAndView model = new ModelAndView();
+        Canvas canvas = new Canvas();
+        model.addObject("canvasObject", canvas);
+        model.addObject("prettyJson", "JSON Output");
+        model.setViewName("canvas");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitCanvas", method = RequestMethod.POST)
+    protected ModelAndView submitCanvas(@Valid @ModelAttribute Canvas
+                                                canvasObject, BindingResult result
+    ) {
+        String urlCanvas = canvasObject.getUrl() + "/api/v1/users/sis_login_id:" + canvasObject.getUserName() + "/courses?access_token=" + canvasObject.getToken();
+        System.out.println("url: " + urlCanvas);
+        ModelAndView modelView = new ModelAndView();
+        String jsonPrettyPrint = prettyPrintJson(urlCanvas);
+        modelView.addObject("prettyJson", jsonPrettyPrint);
+        modelView.addObject("canvasObject", canvasObject);
+
+        modelView.setViewName("canvas");
+        return modelView;
+
+    }
+    private String prettyPrintJson(String url) {
+        String prettyJsonString;
+        try {
+            Content content = Request.Get(url)
+                    .execute().returnContent();
+
+            String responseCanvas = content.asString();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(responseCanvas);
+            prettyJsonString = gson.toJson(je);
+
+
+        } catch (IOException e) {
+            prettyJsonString = "Please recheck field values";
+
+            e.printStackTrace();
+
+
+        }
+        return prettyJsonString;
+
+    }
+}

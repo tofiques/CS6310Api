@@ -1,0 +1,230 @@
+package com.dublabs.Controllers;
+
+
+import com.d2lvalence.idkeyauth.AuthenticationSecurityFactory;
+import com.d2lvalence.idkeyauth.ID2LAppContext;
+import com.d2lvalence.idkeyauth.ID2LUserContext;
+import com.dublabs.Domain.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPConnectionOptions;
+import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.util.ssl.SSLUtil;
+import com.unboundid.util.ssl.TrustAllTrustManager;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.fluent.Content;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.net.ssl.SSLSocketFactory;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by tofiques on 2/11/17.
+ */
+@Controller
+public class IndexController {
+
+
+    @RequestMapping("/home")
+    String index() {
+
+
+
+        return "index";
+    }
+
+
+
+    @RequestMapping(value = "/blackboard", method = RequestMethod.GET)
+    protected ModelAndView blackboard() {
+        ModelAndView model = new ModelAndView();
+        Blackboard blackBoard = new Blackboard();
+        model.addObject("blackBoardObject", blackBoard);
+        model.addObject("prettyJson", "JSON Output");
+        model.setViewName("blackboard");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitBlackboard", method = RequestMethod.POST)
+    protected ModelAndView submitBlackboard(@Valid @ModelAttribute Blackboard
+                                                    blackBoardObject, BindingResult result
+    ) {
+        String jsonPrettyPrint = "";
+        String urlBlackboard = "";
+        System.out.println("blackboard url: " + urlBlackboard);
+        if (!blackBoardObject.getBlackboardKey().isEmpty()) {
+            urlBlackboard = blackBoardObject.getUrl() + "/webapps/dub-mc-bb_bb60/json/courseSearch/courses/";
+            jsonPrettyPrint = prettyPrintJson(urlBlackboard, blackBoardObject.getUserName(), blackBoardObject.getBlackboardKey());
+        } else {
+            urlBlackboard = blackBoardObject.getUrl() + "/webapps/dub-mc-bb_bb60/json/status";
+            jsonPrettyPrint = prettyPrintJson(urlBlackboard);
+        }
+        ModelAndView model = new ModelAndView();
+        model.addObject("blackBoardObject", blackBoardObject);
+        model.addObject("prettyJson", jsonPrettyPrint);
+
+        model.setViewName("blackboard");
+        return model;
+
+    }
+
+    @RequestMapping(value = "/verifyldap")
+    protected ModelAndView getverifyldap() {
+
+
+        LDAPDomain ldapDomain = new LDAPDomain();
+        ModelAndView model = new ModelAndView();
+        model.addObject("ldapObject", ldapDomain);
+        model.addObject("prettyJson", "Not connected");
+   /*     */
+        model.setViewName("ldap");
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitLdap")
+    protected ModelAndView submitLdap(@Valid @ModelAttribute LDAPDomain
+                                              ldapDomain, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("ldap");
+        String prettyPrintJson = "";
+        LDAPConnection ldc = new LDAPConnection();
+        try {
+
+            /*ldc = ping("argon.students.tesu.edu", 636,
+                    "ldaps", "svdubldaps",
+                    "(45!Vent2C0lt$");*/
+            ldc = ping(ldapDomain.getHost(), Integer.parseInt(ldapDomain.getPort()), ldapDomain.getSecureLdapFlag(), ldapDomain.getUserName(), ldapDomain.getPassword());
+
+
+            if (ldc != null) {
+                if (!ldc.isConnected()) {
+
+                    prettyPrintJson = "Not Connected";
+                } else {
+
+                    prettyPrintJson = "Connected to  LDAP successfully";
+
+                }
+            } else {
+
+                prettyPrintJson = "Not Connected";
+            }
+
+        } catch (Exception ex) {
+            prettyPrintJson = "Not Connected";
+        } finally {
+            if (ldc != null) {
+                ldc.close();
+            }
+        }
+        model.addObject("ldapObject", ldapDomain);
+        model.addObject("prettyJson", prettyPrintJson);
+        return model;
+    }
+
+
+
+
+
+
+
+    protected LDAPConnection ping(String host, int port, Boolean secureFlag, String user, String pwd) throws LDAPException,
+            GeneralSecurityException {
+        LDAPConnection rc = null;
+        LDAPConnectionOptions opts = new LDAPConnectionOptions();
+        opts.setConnectTimeoutMillis(5000);
+        opts.setResponseTimeoutMillis(10000);
+        System.out.println("secure ldap:" + secureFlag);
+        if (secureFlag) {
+            SSLSocketFactory sslSocketFactory = new SSLUtil(new TrustAllTrustManager()).createSSLSocketFactory();
+            rc = new LDAPConnection(sslSocketFactory, opts);
+        } else {
+            rc = new LDAPConnection(opts);
+        }
+        rc.connect(host, port);
+        if (user != null && pwd != null) {
+            rc.bind(user, pwd);
+        }
+        return rc;
+    }
+
+
+    private String prettyPrintJson(String url) {
+        String prettyJsonString;
+        try {
+            Content content = Request.Get(url)
+                    .execute().returnContent();
+
+            String responseCanvas = content.asString();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(responseCanvas);
+            prettyJsonString = gson.toJson(je);
+
+
+        } catch (IOException e) {
+            prettyJsonString = "Please recheck field values";
+
+            e.printStackTrace();
+
+
+        }
+        return prettyJsonString;
+
+    }
+
+    private String prettyPrintJson(String url, String userName, String password) {
+        String prettyJsonString;
+        try {
+            String encode = userName + ":" + password;
+            byte[] encodedBytes = Base64.encodeBase64(encode.getBytes());
+            System.out.println(new String(encodedBytes));
+            Content content = Request.Get(url)
+                    .addHeader("Authorization", "Basic " + new String(encodedBytes))
+                    .execute().returnContent();
+
+            String responseCanvas = content.asString();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(responseCanvas);
+            prettyJsonString = gson.toJson(je);
+
+
+        } catch (IOException e) {
+            prettyJsonString = "Please recheck field values";
+            e.printStackTrace();
+
+        }
+        return prettyJsonString;
+
+}
+
+
+
+
+
+
+
+
+
+}

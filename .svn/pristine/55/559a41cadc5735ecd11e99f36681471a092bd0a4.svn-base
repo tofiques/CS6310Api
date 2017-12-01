@@ -1,0 +1,731 @@
+package com.dublabs.Controllers;
+
+
+import com.d2lvalence.idkeyauth.AuthenticationSecurityFactory;
+import com.d2lvalence.idkeyauth.ID2LAppContext;
+import com.d2lvalence.idkeyauth.ID2LUserContext;
+import com.dublabs.Domain.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPConnectionOptions;
+import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.util.ssl.SSLUtil;
+import com.unboundid.util.ssl.TrustAllTrustManager;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.fluent.Content;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.net.ssl.SSLSocketFactory;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by tofiques on 2/11/17.
+ */
+@Controller
+public class IndexController {
+
+
+    @RequestMapping("/home")
+    String index() {
+        String str = String.format("jdbc:oracle:thin:@%s:%s:%s", "207.62.230.156", "1521", "BPP1");
+        Map<String, String[]> SIS_READ_TABLES = new HashMap<String, String[]>();
+        SIS_READ_TABLES.put("courses", new String[]{"GOBTPAC", "GOREMAL", "SIRASGN", "SPRIDEN", "SPBPERS",
+                "SFRSTCR", "SCBCRSE", "SSBSECT", "SSRMEET", "STVCAMP", "STVBLDG", "STVTERM", "STVSUBJ", "SHRTCKN", "SHRTCKG",
+                "STVRSTS", "SSRTEXT"});
+        SIS_READ_TABLES.put("enrollment", new String[]{"GOBTPAC", "GOREMAL", "GTVSDAX", "SCBCRSE", "SCBDESC",
+                "SCRLEVL", "SCRATTR", "SCRGMOD", "SFBETRM", "SFRRACL", "SFRSTCR", "SFTREGS", "SGBSTDN", "SIRASGN", "SOBTERM",
+                "SOBWLTC", "SORRTRM", "SPRIDEN", "SSBSECT", "SSRMEET", "SSRRATT", "SSRRLVL", "SSRTEXT", "STVBLDG", "STVCAMP",
+                "STVRSTS", "STVSSTS", "STVSUBJ", "STVTERM", "TWGRMENU", "SFRMHRS", "SFBRGRP", "SSRLINK", "SFRWCTL", "SFBWCTL",
+                "SFRRSTS", "SFRCTRL", "SSBXLST", "SSRXLST", "SPRHOLD", "RORHOLD", "STVHLDD", "STVSTST", "STVASTD", "STVORIG",
+                "STVSCHD", "SHRTTRM", "STVCAST", "SSRCORQ", "SCRCORQ", "SCRRATT", "STVESTS", "STVGMOD", "BWCKLIBS", "SFKCURS", "SFKEDIT", "SFKMODS",
+                "SFKFUNC", "SFKRCTL", "SFKPREQ", "SFKFEES", "SOKTABS", "SFKWLAT", "SFKWAIT", "SFKSELS", "SB_WL_NOTIFICATION",
+                "RP_AWARD"});
+        SIS_READ_TABLES.put("finaid", new String[]{"RFRBASE", "RPRAWRD", "RFRASPC", "RTVAWST", "STVTERM", "RORSTAT", "ROBINST", "RFRASPC"});
+        SIS_READ_TABLES.put("holds", new String[]{"SPRHOLD", "RORHOLD", "RTVHOLD", "STVHLDD", "STVORIG"});
+        SIS_READ_TABLES.put("catalog", new String[]{"SCBCRSE", "SCBDESC", "STVSUBJ", "STVTERM", "STVDEPT", "STVBLDG",
+                "STVCOLL", "SSBSECT", "SSRMEET"});
+
+        System.out.println(str);
+
+
+        String[] tables = SIS_READ_TABLES.get("enrollment");
+        Connection connection = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+       /* try {
+
+            connection = DriverManager.getConnection(
+                    str, "sc_mobile_user", "kLj+s4IJkgf89$fF");
+            if (connection != null) {
+                String sql = "select count(*) from %s";
+                for (String a : tables) {
+                    try {
+                        stmt = connection.createStatement();
+                        rs = stmt.executeQuery(String.format(sql, a));
+                        while(rs.next()) {
+                            int count = rs.getInt("count(*)");
+                           // System.out.println(a + " count"  + count);
+                        }
+                    } catch (SQLException sqle) {
+                        System.out.println(a + " " + sqle.getMessage());
+
+                    }
+
+                }
+                connection.close();
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Connection Failed! Check output console");
+            e.printStackTrace();
+
+
+        }
+
+*/
+
+
+        return "test";
+    }
+
+    @RequestMapping(value = "/canvas", method = RequestMethod.GET)
+    protected ModelAndView canvas() {
+        ModelAndView model = new ModelAndView();
+        Canvas canvas = new Canvas();
+        model.addObject("canvasObject", canvas);
+        model.addObject("prettyJson", "JSON Output");
+        model.setViewName("canvas");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitCanvas", method = RequestMethod.POST)
+    protected ModelAndView submitCanvas(@Valid @ModelAttribute Canvas
+                                                canvasObject, BindingResult result
+    ) {
+        String urlCanvas = canvasObject.getUrl() + "/api/v1/users/sis_login_id:" + canvasObject.getUserName() + "/courses?access_token=" + canvasObject.getToken();
+        System.out.println("url: " + urlCanvas);
+        ModelAndView modelView = new ModelAndView();
+        String jsonPrettyPrint = prettyPrintJson(urlCanvas);
+        modelView.addObject("prettyJson", jsonPrettyPrint);
+        modelView.addObject("canvasObject", canvasObject);
+
+        modelView.setViewName("canvas");
+        return modelView;
+
+    }
+
+    @RequestMapping(value = "/blackboard", method = RequestMethod.GET)
+    protected ModelAndView blackboard() {
+        ModelAndView model = new ModelAndView();
+        Blackboard blackBoard = new Blackboard();
+        model.addObject("blackBoardObject", blackBoard);
+        model.addObject("prettyJson", "JSON Output");
+        model.setViewName("blackboard");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitBlackboard", method = RequestMethod.POST)
+    protected ModelAndView submitBlackboard(@Valid @ModelAttribute Blackboard
+                                                    blackBoardObject, BindingResult result
+    ) {
+        String jsonPrettyPrint = "";
+        String urlBlackboard = "";
+        System.out.println("blackboard url: " + urlBlackboard);
+        if (!blackBoardObject.getBlackboardKey().isEmpty()) {
+            urlBlackboard = blackBoardObject.getUrl() + "/webapps/dub-mc-bb_bb60/json/courseSearch/courses/";
+            jsonPrettyPrint = prettyPrintJson(urlBlackboard, blackBoardObject.getUserName(), blackBoardObject.getBlackboardKey());
+        } else {
+            urlBlackboard = blackBoardObject.getUrl() + "/webapps/dub-mc-bb_bb60/json/status";
+            jsonPrettyPrint = prettyPrintJson(urlBlackboard);
+        }
+        ModelAndView model = new ModelAndView();
+        model.addObject("blackBoardObject", blackBoardObject);
+        model.addObject("prettyJson", jsonPrettyPrint);
+
+        model.setViewName("blackboard");
+        return model;
+
+    }
+
+    @RequestMapping(value = "/verifyldap")
+    protected ModelAndView getverifyldap() {
+
+
+        LDAPDomain ldapDomain = new LDAPDomain();
+        ModelAndView model = new ModelAndView();
+        model.addObject("ldapObject", ldapDomain);
+        model.addObject("prettyJson", "Not connected");
+   /*     */
+        model.setViewName("ldap");
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitLdap")
+    protected ModelAndView submitLdap(@Valid @ModelAttribute LDAPDomain
+                                              ldapDomain, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("ldap");
+        String prettyPrintJson = "";
+        LDAPConnection ldc = new LDAPConnection();
+        try {
+
+            /*ldc = ping("argon.students.tesu.edu", 636,
+                    "ldaps", "svdubldaps",
+                    "(45!Vent2C0lt$");*/
+            ldc = ping(ldapDomain.getHost(), Integer.parseInt(ldapDomain.getPort()), ldapDomain.getSecureLdapFlag(), ldapDomain.getUserName(), ldapDomain.getPassword());
+
+
+            if (ldc != null) {
+                if (!ldc.isConnected()) {
+
+                    prettyPrintJson = "Not Connected";
+                } else {
+
+                    prettyPrintJson = "Connected to  LDAP successfully";
+
+                }
+            } else {
+
+                prettyPrintJson = "Not Connected";
+            }
+
+        } catch (Exception ex) {
+            prettyPrintJson = "Not Connected";
+        } finally {
+            if (ldc != null) {
+                ldc.close();
+            }
+        }
+        model.addObject("ldapObject", ldapDomain);
+        model.addObject("prettyJson", prettyPrintJson);
+        return model;
+    }
+
+    @RequestMapping(value = "/colleagueLogin", method = RequestMethod.GET)
+    protected ModelAndView colleagueLogin() {
+        ModelAndView model = new ModelAndView();
+        ColleagueDomain colleagueDomain = new ColleagueDomain();
+        model.addObject("colleagueObject", colleagueDomain);
+        model.addObject("prettyJson", "");
+        model.setViewName("colleague");
+
+        return model;
+
+    }
+
+
+    @RequestMapping(value = "/submitColleagueLogin", method = RequestMethod.POST)
+    protected ModelAndView submitColleagueLogin(@Valid @ModelAttribute ColleagueDomain
+                                                        colleagueObject, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        try {
+            String loginUrl = colleagueObject.getColleagueUrl() + "/session/login";
+            String bodyString = "{\"Password\": \"" + colleagueObject.getPassword() + "\",\"UserId\": \"" + colleagueObject.getUserName() + "\"}";
+
+
+            Content content = Request.Post(loginUrl)
+                    .addHeader("Content-Type", "application/json")
+                    .bodyString(bodyString, ContentType.APPLICATION_JSON)
+                    .execute().returnContent();
+
+
+            System.out.println(content);
+            String token = content.asString().substring(content.toString().indexOf(".") + 1);
+            byte[] barr = Base64.decodeBase64(token);
+            System.out.println("Decoded value is " + new String(barr));
+            model.addObject("prettyJson", new String(barr));
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        model.addObject("colleagueObject", colleagueObject);
+        model.setViewName("colleague");
+
+        return model;
+
+    }
+
+
+    @RequestMapping(value = "/colleagueSis", method = RequestMethod.GET)
+    protected ModelAndView colleagueSis() {
+        ModelAndView model = new ModelAndView();
+        ColleagueDomain colleagueDomain = new ColleagueDomain();
+        model.addObject("colleagueObject", colleagueDomain);
+        model.addObject("prettyJson", "");
+        model.setViewName("colleaguesis");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitColleagueSis", method = RequestMethod.POST)
+    protected ModelAndView colleagueSisPost(@Valid @ModelAttribute ColleagueDomain
+                                                    colleagueObject, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        if (colleagueObject.getAuthUserName().isEmpty()) {
+            String token = colleagueToken(colleagueObject);
+            String pid = pid(token);
+            System.out.println(pid);
+            String url = colleagueObject.getColleagueUrl() + "/students/" + pid + "/academic-credits";
+            String jsonPrettyPrint = prettyPrintJson(url, colleagueObject.getUserName(), colleagueObject.getPassword());
+
+            model.addObject("prettyJson", jsonPrettyPrint);
+        } else {
+            String loginUrl = colleagueObject.getColleagueUrl() + "/session/proxy-login";
+            String bodyString = "{\"ProxyId\": \"" + colleagueObject.getUserName() + "\",\"ProxyPassword\": \"" + colleagueObject.getPassword() + "\"," + "\"UserId\": \"" + colleagueObject.getAuthUserName() + "\"}";
+            System.out.println(bodyString);
+            try {
+                Content content = Request.Post(loginUrl)
+                        .addHeader("Content-Type", "application/json")
+                        .bodyString(bodyString, ContentType.APPLICATION_JSON)
+                        .execute().returnContent();
+                String fulltoken = content.toString();
+                String token = fulltoken.substring(fulltoken.toString().indexOf(".") + 1);
+                byte[] barr = Base64.decodeBase64(token);
+                String decodedValue = new String(barr);
+
+                String pid = pid(decodedValue);
+
+                Content contentforcourses = Request.Get(colleagueObject.getColleagueUrl() + "/students/" + pid + "/academic-credits")
+                        .addHeader("X-Customcredentials", fulltoken)
+                        .addHeader("Content-Type", "application/json")
+                        .execute().returnContent();
+                String responseColleague = contentforcourses.asString();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonParser jp = new JsonParser();
+                JsonElement je = jp.parse(responseColleague);
+                String jsonPrettyPrint = gson.toJson(je);
+
+                model.addObject("prettyJson", jsonPrettyPrint);
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+        }
+        model.addObject("colleagueObject", colleagueObject);
+        model.setViewName("colleaguesis");
+
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/d2lLms", method = RequestMethod.GET)
+    protected ModelAndView dslLms() {
+        ModelAndView model = new ModelAndView();
+        D2L d2l = new D2L();
+        model.addObject("dslObject", d2l);
+        model.addObject("prettyJson", "JSON Output");
+        model.setViewName("d2l");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitD2lLms", method = RequestMethod.POST)
+    protected ModelAndView dslLmsPost(@Valid @ModelAttribute D2L
+                                              d2lObject, BindingResult result) {
+
+        ModelAndView model = new ModelAndView();
+
+        try {
+            ID2LAppContext appContext = new AuthenticationSecurityFactory().createSecurityContext(d2lObject.getAppId(), d2lObject.getAppKey());
+            ID2LUserContext userContext = getUserContext(appContext, d2lObject.getUrl(), d2lObject.getUserId(), d2lObject.getUserKey());
+            URL url2 = userContext.createAuthenticatedUri("/d2l/api/lp/1.0/users/whoami", "GET").toURL();
+            Content content = Request.Get(url2.toString())
+                    .execute().returnContent();
+
+            String prettyJson = prettyPrintJson(url2.toString());
+
+            model.addObject("prettyJson", prettyJson);
+        } catch (IOException e) {
+            System.out.println(e);
+            String prettyJson = "Recheck Feilds";
+            model.addObject("prettyJson", prettyJson);
+        }
+        model.addObject("dslObject", d2lObject);
+
+        model.setViewName("d2l");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/bannerSis", method = RequestMethod.GET)
+    protected ModelAndView bannerSis() {
+        ModelAndView model = new ModelAndView();
+        BannerDomain banner = new BannerDomain();
+        model.addObject("bannerObject", banner);
+        model.addObject("prettyJson", "");
+        model.addObject("jdbc", "");
+        model.setViewName("bannerSis");
+        return model;
+    }
+
+
+    @RequestMapping(value = "/submitBannerSis", method = RequestMethod.POST)
+    protected ModelAndView banner(@Valid @ModelAttribute BannerDomain
+                                          bannerObject, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        StringBuffer sb = new StringBuffer();
+        String[] coursesTable = new String[]{"GOBTPAC", "GOREMAL", "SIRASGN", "SPRIDEN", "SPBPERS",
+                "SFRSTCR", "SCBCRSE", "SSBSECT", "SSRMEET", "STVCAMP", "STVBLDG", "STVTERM", "STVSUBJ", "SHRTCKN", "SHRTCKG",
+                "STVRSTS", "SSRTEXT"};
+        String[] holdTable = new String[]{"SPRHOLD", "RORHOLD", "RTVHOLD", "STVHLDD", "STVORIG"};
+        String[] bursarTable = new String[]{"Dub_Bursar"};
+        String[] courseCatalogTable = new String[]{"SCBCRSE", "SCBDESC", "STVSUBJ", "STVTERM", "STVDEPT", "STVBLDG",
+                "STVCOLL", "SSBSECT", "SSRMEET"};
+        String[] enrollmentSelectTable = new String[]{"GOBTPAC", "GOREMAL", "GTVSDAX", "SCBCRSE", "SCBDESC",
+                "SCRLEVL", "SCRATTR", "SCRGMOD", "SFBETRM", "SFRRACL", "SFRSTCR", "SFTREGS", "SGBSTDN", "SIRASGN", "SOBTERM",
+                "SOBWLTC", "SORRTRM", "SPRIDEN", "SSBSECT", "SSRMEET", "SSRRATT", "SSRRLVL", "SSRTEXT", "STVBLDG", "STVCAMP",
+                "STVRSTS", "STVSSTS", "STVSUBJ", "STVTERM", "TWGRMENU", "SFRMHRS", "SFBRGRP", "SSRLINK", "SFRWCTL", "SFBWCTL",
+                "SFRRSTS", "SFRCTRL", "SSBXLST", "SSRXLST", "SPRHOLD", "RORHOLD", "STVHLDD", "STVSTST", "STVASTD", "STVORIG",
+                "STVSCHD", "SHRTTRM", "STVCAST", "SSRCORQ", "SCRCORQ", "SCRRATT", "STVESTS", "STVGMOD"};
+        String[] finAidSelect = new String[]{"RFRBASE", "RPRAWRD", "RFRASPC", "RTVAWST", "STVTERM", "RORSTAT", "ROBINST", "RFRASPC"};
+        String[] enrollmentExecute = new String[]{"BWCKLIBS", "SFKCURS", "SFKEDIT", "SFKMODS",
+                "SFKFUNC", "SFKRCTL", "SFKPREQ", "SFKFEES", "SOKTABS", "SFKWLAT", "SFKWAIT", "SFKSELS", "SB_WL_NOTIFICATION",
+                "RP_AWARD"};
+        String[] finAidExecute = new String[]{"RFRBASE", "RPRAWRD", "RFRASPC", "RTVAWST", "STVTERM", "RORSTAT", "ROBINST", "RFRASPC"};
+        String[] authenticate = new String[]{"GOBTPAC"};
+
+        String queryFormat = "select PRIVILEGE from ALL_TAB_PRIVS_RECD where TABLE_NAME='%s'";
+
+
+        String jdbcUrl = getJDBCUrl(bannerObject.getUrl(), bannerObject.getPort(), bannerObject.getSid(), bannerObject.getUserName(), bannerObject.getPassword());
+        model.addObject("jdbc", jdbcUrl);
+        String sqlselect = "select count(*) from %s";
+        if (bannerObject.getCourses()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, coursesTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Courses are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getEnrollment()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, enrollmentSelectTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Enrollment are available with Select Permission \n");
+            } else {
+                sb.append(errormessage);
+            }
+            String errormessageExec = getTablesBannerExecute(jdbcUrl, queryFormat, enrollmentExecute);
+            if (errormessageExec.isEmpty()) {
+                sb.append("All tables for Enrollment are available with Execute Permission \n");
+            } else {
+                sb.append(errormessageExec);
+            }
+        }
+        if (bannerObject.getFinAid()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, finAidSelect);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Financial Aid are available with Select Permission \n");
+            } else {
+                sb.append(errormessage);
+            }
+            String errormessageExec = getTablesBannerExecute(jdbcUrl, queryFormat, finAidExecute);
+            if (errormessageExec.isEmpty()) {
+                sb.append("All tables for Financial Aid are available with Execute Permission \n");
+            } else {
+                sb.append(errormessageExec);
+            }
+        }
+        if (bannerObject.getBursar()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, bursarTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Bursar are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getHolds()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, holdTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Holds are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getCourseCatalog()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, courseCatalogTable);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Course Catalog are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        if (bannerObject.getAuthenticate()) {
+            String errormessage = getTablesBanner(jdbcUrl, sqlselect, authenticate);
+            if (errormessage.isEmpty()) {
+                sb.append("All tables for Authentication are available \n");
+            } else {
+                sb.append(errormessage);
+            }
+        }
+        model.addObject("prettyJson", sb.toString());
+        model.addObject("bannerObject", bannerObject);
+
+        model.setViewName("bannerSis");
+        return model;
+    }
+
+
+    protected String getTablesBanner(String jdbcUrl, String sql, String[] tables) {
+        Connection connection = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        StringBuffer sb = new StringBuffer();
+        try {
+
+            connection = DriverManager.getConnection(
+                    jdbcUrl, "sc_mobile_user", "kLj+s4IJkgf89$fF");
+            if (connection != null) {
+
+
+                for (String table : tables) {
+                    try {
+                        stmt = connection.createStatement();
+                        rs = stmt.executeQuery(String.format(sql, table));
+                        while (rs.next()) {
+                            int count = rs.getInt("count(*)");
+                            // System.out.println(table + " count"  + count);
+                        }
+                    } catch (SQLException sqle) {
+                        sb.append(table + " " + sqle.getMessage());
+
+                    }
+
+                }
+                connection.close();
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+
+        } catch (SQLException e) {
+
+
+            e.printStackTrace();
+
+
+        }
+        return sb.toString();
+    }
+
+    protected String getTablesBannerExecute(String jdbcUrl, String sql, String[] tables) {
+        Connection connection = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        StringBuffer sb = new StringBuffer();
+        try {
+
+            connection = DriverManager.getConnection(
+                    jdbcUrl, "sc_mobile_user", "kLj+s4IJkgf89$fF");
+            if (connection != null) {
+
+
+                for (String table : tables) {
+                    try {
+                        stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+                        rs = stmt.executeQuery(String.format(sql, table));
+                        if (rs.next()) {
+                            rs.beforeFirst();
+                            while (rs.next()) {
+                                String privilege = rs.getString("PRIVILEGE");
+                                if (!privilege.equals("EXECUTE")) {
+                                    sb.append(table + " :no execute permission" + "\n");
+                                }
+                            }
+                        } else {
+                            sb.append(table + " :no execute permission" + "\n");
+                        }
+                    } catch (SQLException sqle) {
+                        sb.append(table + " " + sqle.getMessage() + "\n");
+
+                    }
+
+                }
+                connection.close();
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+
+        } catch (SQLException e) {
+
+
+            e.printStackTrace();
+
+
+        }
+        return sb.toString();
+    }
+
+    protected LDAPConnection ping(String host, int port, Boolean secureFlag, String user, String pwd) throws LDAPException,
+            GeneralSecurityException {
+        LDAPConnection rc = null;
+        LDAPConnectionOptions opts = new LDAPConnectionOptions();
+        opts.setConnectTimeoutMillis(5000);
+        opts.setResponseTimeoutMillis(10000);
+        System.out.println("secure ldap:" + secureFlag);
+        if (secureFlag) {
+            SSLSocketFactory sslSocketFactory = new SSLUtil(new TrustAllTrustManager()).createSSLSocketFactory();
+            rc = new LDAPConnection(sslSocketFactory, opts);
+        } else {
+            rc = new LDAPConnection(opts);
+        }
+        rc.connect(host, port);
+        if (user != null && pwd != null) {
+            rc.bind(user, pwd);
+        }
+        return rc;
+    }
+
+
+    private String prettyPrintJson(String url) {
+        String prettyJsonString;
+        try {
+            Content content = Request.Get(url)
+                    .execute().returnContent();
+
+            String responseCanvas = content.asString();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(responseCanvas);
+            prettyJsonString = gson.toJson(je);
+
+
+        } catch (IOException e) {
+            prettyJsonString = "Please recheck field values";
+
+            e.printStackTrace();
+
+
+        }
+        return prettyJsonString;
+
+    }
+
+    private String prettyPrintJson(String url, String userName, String password) {
+        String prettyJsonString;
+        try {
+            String encode = userName + ":" + password;
+            byte[] encodedBytes = Base64.encodeBase64(encode.getBytes());
+            System.out.println(new String(encodedBytes));
+            Content content = Request.Get(url)
+                    .addHeader("Authorization", "Basic " + new String(encodedBytes))
+                    .execute().returnContent();
+
+            String responseCanvas = content.asString();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(responseCanvas);
+            prettyJsonString = gson.toJson(je);
+
+
+        } catch (IOException e) {
+            prettyJsonString = "Please recheck field values";
+            e.printStackTrace();
+
+        }
+        return prettyJsonString;
+
+    }
+
+    private String colleagueToken(ColleagueDomain colleagueObject) {
+        String decodedValue;
+        try {
+            String loginUrl = colleagueObject.getColleagueUrl() + "/session/login";
+            String bodyString = "{\"Password\": \"" + colleagueObject.getPassword() + "\",\"UserId\": \"" + colleagueObject.getUserName() + "\"}";
+
+
+            Content content = Request.Post(loginUrl)
+                    .addHeader("Content-Type", "application/json")
+                    .bodyString(bodyString, ContentType.APPLICATION_JSON)
+                    .execute().returnContent();
+
+
+            System.out.println(content);
+            String token = content.asString().substring(content.toString().indexOf(".") + 1);
+            byte[] barr = Base64.decodeBase64(token);
+            System.out.println("Decoded value is " + new String(barr));
+            decodedValue = new String(barr);
+
+        } catch (IOException e) {
+            decodedValue = "Unavailable to get token";
+            System.out.println(e);
+        }
+        return decodedValue;
+
+    }
+
+    ID2LUserContext getUserContext(ID2LAppContext appContext, String url, String userId, String userKey)
+            throws MalformedURLException {
+        URL ep = new URL(url.trim());
+        String host = ep.getHost();
+        int port = ep.getPort();
+        if (port <= 0) {
+            port = ep.getDefaultPort();
+        }
+        return appContext.createUserContext(userId, userKey, host, port, true);
+    }
+
+    private String pid(String jsonString) {
+
+
+        JsonParser jp = new JsonParser();
+        JsonElement je = jp.parse(jsonString);
+        String pid = je.getAsJsonObject().get("pid").getAsString();
+
+        return pid;
+
+    }
+
+    private String getJDBCUrl(String url, String port, String sid, String userName, String password) {
+        String urlOne = String.format("jdbc:oracle:thin:@%s:%s:%s", url, port, sid);
+        String urlTwo = String.format("jdbc:oracle:thin:@//%s:%s/%s", url, port, sid);
+        String[] connectionString = {urlTwo, urlOne};
+        Connection connection = null;
+        for (String jdbcurl : connectionString) {
+            try {
+                connection = DriverManager.getConnection(jdbcurl, userName, password);
+                if (connection != null) {
+                    connection.close();
+                    return jdbcurl;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return "Can not connect";
+    }
+
+}
+          /*dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
+            dataSource.setUrl("jdbc:hsqldb:hsql://localhost:");
+            dataSource.setUsername("sa");
+            dataSource.setPassword("");
+            jdbcTemplate.setDataSource(dataSource);
+*/

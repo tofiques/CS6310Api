@@ -1,0 +1,16 @@
+#spring.datasource.url= jdbc:postgresql://localhost:5432/dub
+#spring.datasource.username=tofiques
+#spring.jpa.hibernate.ddl-auto=update
+#
+#
+#spring.jpa.database=postgresql
+#spring.jpa.show-sql=true
+
+
+spring.thymeleaf.cache:false
+#spring.mvc.static-path-pattern=/resources/**
+spring.resources.chain.strategy.content.enabled=true
+spring.resources.chain.strategy.content.paths=/**
+
+
+

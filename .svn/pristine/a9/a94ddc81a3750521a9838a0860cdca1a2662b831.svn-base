@@ -1,0 +1,117 @@
+package com.dublabs.Controllers;
+
+import com.d2lvalence.idkeyauth.AuthenticationSecurityFactory;
+import com.d2lvalence.idkeyauth.ID2LAppContext;
+import com.d2lvalence.idkeyauth.ID2LUserContext;
+import com.dublabs.Domain.D2L;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import org.apache.http.client.fluent.Content;
+import org.apache.http.client.fluent.Request;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ * Created by tofiques on 4/11/17.
+ */
+
+
+@Controller
+public class D2LController {
+
+    @RequestMapping(value = "/d2lLms", method = RequestMethod.GET)
+    protected ModelAndView d2lLms() {
+        ModelAndView model = new ModelAndView();
+        D2L d2l = new D2L();
+        model.addObject("dslObject", d2l);
+        model.addObject("prettyJson", "JSON Output");
+        model.setViewName("d2l");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitD2lLms", method = RequestMethod.POST)
+    protected ModelAndView d2lLmsPost(@Valid @ModelAttribute D2L
+                                              d2lObject, BindingResult result) {
+
+        ModelAndView model = new ModelAndView();
+
+        try {
+            ID2LAppContext appContext = new AuthenticationSecurityFactory().createSecurityContext(d2lObject.getAppId(), d2lObject.getAppKey());
+            ID2LUserContext userContext = getUserContext(appContext, d2lObject.getUrl(), d2lObject.getUserId(), d2lObject.getUserKey());
+            URL url2 = userContext.createAuthenticatedUri("/d2l/api/lp/1.0/users/whoami", "GET").toURL();
+            Content content = Request.Get(url2.toString())
+                    .execute().returnContent();
+
+            String prettyJson = prettyPrintJson(url2.toString());
+
+            model.addObject("prettyJson", prettyJson);
+        } catch (IOException e) {
+            System.out.println(e);
+            String prettyJson = "Recheck Feilds";
+            model.addObject("prettyJson", prettyJson);
+        }
+        model.addObject("dslObject", d2lObject);
+
+        model.setViewName("d2l");
+
+        return model;
+
+    }
+
+
+
+    @RequestMapping(value = "/d2l", method = RequestMethod.GET)
+    protected ModelAndView d2lAuth(){
+        ModelAndView model = new ModelAndView();
+        return model;
+    }
+
+    ID2LUserContext getUserContext(ID2LAppContext appContext, String url, String userId, String userKey)
+            throws MalformedURLException {
+        URL ep = new URL(url.trim());
+        String host = ep.getHost();
+        int port = ep.getPort();
+        if (port <= 0) {
+            port = ep.getDefaultPort();
+        }
+        return appContext.createUserContext(userId, userKey, host, port, true);
+    }
+
+    private String prettyPrintJson(String url) {
+        String prettyJsonString;
+        try {
+            Content content = Request.Get(url)
+                    .execute().returnContent();
+
+            String responseCanvas = content.asString();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(responseCanvas);
+            prettyJsonString = gson.toJson(je);
+
+
+        } catch (IOException e) {
+            prettyJsonString = "Please recheck field values";
+
+            e.printStackTrace();
+
+
+        }
+        return prettyJsonString;
+
+    }
+
+}

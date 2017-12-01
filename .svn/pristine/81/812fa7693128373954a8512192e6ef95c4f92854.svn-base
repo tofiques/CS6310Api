@@ -1,0 +1,87 @@
+package com.dublabs.Domain;
+
+/**
+ * Created by tofiques on 3/13/17.
+ */
+
+
+
+public class ColleagueDomain {
+
+
+    private Long id;
+    private  String colleagueUrl;
+    private  String userName;
+    private String password;
+    private Boolean proxy;
+    private String pidm;
+    private String decodedToken;
+    private String authUserName;
+
+    public String getAuthUserName() {
+        return authUserName;
+    }
+
+    public void setAuthUserName(String authUserName) {
+        this.authUserName = authUserName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getPidm() {
+        return pidm;
+    }
+
+    public void setPidm(String pidm) {
+        this.pidm = pidm;
+    }
+
+    public String getDecodedToken() {
+        return decodedToken;
+    }
+
+    public void setDecodedToken(String decodedToken) {
+        this.decodedToken = decodedToken;
+    }
+
+    public String getColleagueUrl() {
+        return colleagueUrl;
+    }
+
+    public void setColleagueUrl(String colleagueUrl) {
+        this.colleagueUrl = colleagueUrl;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Boolean getProxy() {
+        return proxy;
+    }
+
+    public void setProxy(Boolean proxy) {
+        this.proxy = proxy;
+    }
+
+
+
+}

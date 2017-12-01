@@ -1,0 +1,201 @@
+package com.dublabs.Controllers;
+
+import com.dublabs.Domain.ColleagueDomain;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.fluent.Content;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
+import java.io.IOException;
+
+/**
+ * Created by tofiques on 4/11/17.
+ */
+
+
+@Controller
+public class ColleagueController {
+
+
+
+    @RequestMapping(value = "/colleagueLogin", method = RequestMethod.GET)
+    protected ModelAndView colleagueLogin() {
+        ModelAndView model = new ModelAndView();
+        ColleagueDomain colleagueDomain = new ColleagueDomain();
+        model.addObject("colleagueObject", colleagueDomain);
+        model.addObject("prettyJson", "");
+        model.setViewName("colleague");
+
+        return model;
+
+    }
+
+
+    @RequestMapping(value = "/submitColleagueLogin", method = RequestMethod.POST)
+    protected ModelAndView submitColleagueLogin(@Valid @ModelAttribute ColleagueDomain
+                                                        colleagueObject, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        try {
+            String loginUrl = colleagueObject.getColleagueUrl() + "/session/login";
+            String bodyString = "{\"Password\": \"" + colleagueObject.getPassword() + "\",\"UserId\": \"" + colleagueObject.getUserName() + "\"}";
+
+
+            Content content = Request.Post(loginUrl)
+                    .addHeader("Content-Type", "application/json")
+                    .bodyString(bodyString, ContentType.APPLICATION_JSON)
+                    .execute().returnContent();
+
+
+            System.out.println(content);
+            String token = content.asString().substring(content.toString().indexOf(".") + 1);
+            byte[] barr = Base64.decodeBase64(token);
+            System.out.println("Decoded value is " + new String(barr));
+            model.addObject("prettyJson", new String(barr));
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        model.addObject("colleagueObject", colleagueObject);
+        model.setViewName("colleague");
+
+        return model;
+
+    }
+
+
+    @RequestMapping(value = "/colleagueSis", method = RequestMethod.GET)
+    protected ModelAndView colleagueSis() {
+        ModelAndView model = new ModelAndView();
+        ColleagueDomain colleagueDomain = new ColleagueDomain();
+        model.addObject("colleagueObject", colleagueDomain);
+        model.addObject("prettyJson", "");
+        model.setViewName("colleaguesis");
+
+        return model;
+
+    }
+
+    @RequestMapping(value = "/submitColleagueSis", method = RequestMethod.POST)
+    protected ModelAndView colleagueSisPost(@Valid @ModelAttribute ColleagueDomain
+                                                    colleagueObject, BindingResult result) {
+        ModelAndView model = new ModelAndView();
+        if (colleagueObject.getAuthUserName().isEmpty()) {
+            String token = colleagueToken(colleagueObject);
+            String pid = pid(token);
+            System.out.println(pid);
+            String url = colleagueObject.getColleagueUrl() + "/students/" + pid + "/academic-credits";
+            String jsonPrettyPrint = prettyPrintJson(url, colleagueObject.getUserName(), colleagueObject.getPassword());
+
+            model.addObject("prettyJson", jsonPrettyPrint);
+        } else {
+            String loginUrl = colleagueObject.getColleagueUrl() + "/session/proxy-login";
+            String bodyString = "{\"ProxyId\": \"" + colleagueObject.getUserName() + "\",\"ProxyPassword\": \"" + colleagueObject.getPassword() + "\"," + "\"UserId\": \"" + colleagueObject.getAuthUserName() + "\"}";
+            System.out.println(bodyString);
+            try {
+                Content content = Request.Post(loginUrl)
+                        .addHeader("Content-Type", "application/json")
+                        .bodyString(bodyString, ContentType.APPLICATION_JSON)
+                        .execute().returnContent();
+                String fulltoken = content.toString();
+                String token = fulltoken.substring(fulltoken.toString().indexOf(".") + 1);
+                byte[] barr = Base64.decodeBase64(token);
+                String decodedValue = new String(barr);
+
+                String pid = pid(decodedValue);
+
+                Content contentforcourses = Request.Get(colleagueObject.getColleagueUrl() + "/students/" + pid + "/academic-credits")
+                        .addHeader("X-Customcredentials", fulltoken)
+                        .addHeader("Content-Type", "application/json")
+                        .execute().returnContent();
+                String responseColleague = contentforcourses.asString();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonParser jp = new JsonParser();
+                JsonElement je = jp.parse(responseColleague);
+                String jsonPrettyPrint = gson.toJson(je);
+
+                model.addObject("prettyJson", jsonPrettyPrint);
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+        }
+        model.addObject("colleagueObject", colleagueObject);
+        model.setViewName("colleaguesis");
+
+
+        return model;
+
+    }
+
+
+    private String pid(String jsonString) {
+
+
+        JsonParser jp = new JsonParser();
+        JsonElement je = jp.parse(jsonString);
+        String pid = je.getAsJsonObject().get("pid").getAsString();
+
+        return pid;
+
+    }
+    private String colleagueToken(ColleagueDomain colleagueObject) {
+        String decodedValue;
+        try {
+            String loginUrl = colleagueObject.getColleagueUrl() + "/session/login";
+            String bodyString = "{\"Password\": \"" + colleagueObject.getPassword() + "\",\"UserId\": \"" + colleagueObject.getUserName() + "\"}";
+
+
+            Content content = Request.Post(loginUrl)
+                    .addHeader("Content-Type", "application/json")
+                    .bodyString(bodyString, ContentType.APPLICATION_JSON)
+                    .execute().returnContent();
+
+
+            System.out.println(content);
+            String token = content.asString().substring(content.toString().indexOf(".") + 1);
+            byte[] barr = Base64.decodeBase64(token);
+            System.out.println("Decoded value is " + new String(barr));
+            decodedValue = new String(barr);
+
+        } catch (IOException e) {
+            decodedValue = "Unavailable to get token";
+            System.out.println(e);
+        }
+        return decodedValue;
+
+    }
+    private String prettyPrintJson(String url, String userName, String password) {
+        String prettyJsonString;
+        try {
+            String encode = userName + ":" + password;
+            byte[] encodedBytes = Base64.encodeBase64(encode.getBytes());
+            System.out.println(new String(encodedBytes));
+            Content content = Request.Get(url)
+                    .addHeader("Authorization", "Basic " + new String(encodedBytes))
+                    .execute().returnContent();
+
+            String responseCanvas = content.asString();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(responseCanvas);
+            prettyJsonString = gson.toJson(je);
+
+
+        } catch (IOException e) {
+            prettyJsonString = "Please recheck field values";
+            e.printStackTrace();
+
+        }
+        return prettyJsonString;
+
+    }
+}

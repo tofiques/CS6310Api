@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <link rel="icon" href="../../favicon.ico"/>
+
+    <title>Dublabs Verify</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/home.css" rel="stylesheet"/>
+    <script th:src="@{../js/jquery-3.2.0.min.js}"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+</head>
+
+
+<body>
+<div class="container">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button url="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Verify Application</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">Authentication <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Banner</a></li>
+                            <li><a href="#">D2L</a></li>
+                            <li><a href="#">LDAP</a></li>
+                            <li><a href="#">SSO</a></li>
+                            <li><a href="#">Colleague</a></li>
+
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">LMS <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a th:href="@{/canvas}">Canvas</a></li>
+                            <li><a href="#">D2L</a></li>
+                            <li><a href="#">Blackboard</a></li>
+                            <li><a href="#">Sakai</a></li>
+                            <li><a href="#">Moodle</a></li>
+
+
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">SIS <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Banner</a></li>
+                            <li><a href="#">PeopleSoft</a></li>
+                            <li><a href="#">CampusManagement</a></li>
+                            <li><a href="#">PowerCampus</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+    </nav>
+    <div>
+
+        <form class="form-horizontal" id="bannerForm" th:action="@{/submitBannerSis}" th:object="${bannerObject}"
+              method="POST">
+
+            <legend>Banner Integration</legend>
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="url">DataBase Url:</label>
+                <input class="col-md-4 control-label" url="text" id="url" th:field="*{url}"/>
+
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="port">Port:</label>
+                <input class="col-md-4 control-label" url="text" id="port" th:field=" *{port}"/>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="sid">SID/Service:</label>
+                <input class="col-md-4 control-label" url="text" id="sid" th:field="*{sid}"/>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="userName">User Name:</label>
+                <input class="col-md-4 control-label" url="text" id="userName" th:field="*{userName}"/>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="password">Password:</label>
+                <input class="col-md-4 control-label" url="text" id="password" th:field="*{password}"/>
+            </div>
+            <div class="form-group">
+                <label class="col-md-1 " for="courses">Courses:</label>
+                <input type="checkbox" class="col-md-1 " url="text" id="courses" th:field="*{courses}" value="True"/>
+                <label class="col-md-1" for="enrollment">Enrollment: </label>
+                <input type="checkbox" class="col-md-1" url="text" id="enrollment" th:field="*{enrollment}" value="True"/>
+                <label class="col-md-1" for="finAid">Financial Aid:</label>
+                <input type="checkbox" class="col-md-1" url="text" id="finAid" th:field="*{finAid}" value="True"/>
+                <label class="col-md-1" for="bursar">Bursar:</label>
+                <input type="checkbox" class="col-md-1" url="text" id="bursar" th:field="*{bursar}" value="True"/>
+                <label class="col-md-1" for="holds">Holds:</label>
+                <input type="checkbox" class="col-md-1" url="text" id="holds" th:field="*{holds}" value="True"/>
+                <label class="col-md-1" for="courseCatalog">Course Catalog:</label>
+                <input type="checkbox" class="col-md-1" url="text" id="courseCatalog" th:field="*{courseCatalog}" value="True"/>
+
+
+            </div>
+            <div class="form-group">
+                <label class="col-md-1" for="auth">Authenticate:</label>
+                <input type="checkbox" class="col-md-1" url="text" id="auth" th:field="*{authenticate}" value="True"/>
+            </div>
+            <div class="form-group">
+                <button id="onSubmit">Submit Request</button>
+            </div>
+            <div class="form-group">
+                <label for="jdbc">JDBC Url:</label>
+                <textarea class="form-control" rows="5" id="jdbc" th:text="${jdbc}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="json">Tables:</label>
+                <textarea class="form-control" rows="5" id="json" th:text="${prettyJson}"></textarea>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

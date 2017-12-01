@@ -1,0 +1,11 @@
+#spring.datasource.url= jdbc:postgresql://localhost:5432/dub
+#spring.datasource.username=tofiques
+#spring.jpa.hibernate.ddl-auto=update
+#
+#
+#spring.jpa.database=postgresql
+#spring.jpa.show-sql=true
+
+
+spring.thymeleaf.cache:false
+

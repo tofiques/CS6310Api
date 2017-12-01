@@ -1,0 +1,7 @@
+com/dublabs/VerifydemoApplication.class
+com/dublabs/Domain/Canvas.class
+com/dublabs/Domain/Blackboard.class
+com/dublabs/Domain/ColleagueDomain.class
+com/dublabs/Controllers/IndexController.class
+com/dublabs/Configuration/SecurityConfiguration.class
+com/dublabs/Domain/LDAPDomain.class

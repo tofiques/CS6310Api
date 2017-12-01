@@ -1,0 +1,26 @@
+package com.dublabs.Domain;
+
+/**
+ * Created by tofiques on 3/28/17.
+ */
+public class Sakai {
+
+    private String url;
+    private String password;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
