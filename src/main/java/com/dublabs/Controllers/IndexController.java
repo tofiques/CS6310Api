@@ -138,8 +138,8 @@ public class IndexController {
         str.add("sdfsad");
         List<RequestsEntity> studentRequest=requests.getRequests();
         for(RequestsEntity re: studentRequest){
-            RequestsEntity dbReq= new RequestsEntity(re.getStudentId(),re.getCourseId());
-            requestRepo.save(dbReq);
+
+            requestRepo.save(re);
         }
         return ResponseEntity.ok(str.size());
     }
