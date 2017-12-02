@@ -49,6 +49,9 @@ public class IndexController {
     @Autowired
     private ProgramRepo programRepo;
 
+    @Autowired
+    private  AcademicRecordsEntityRepo academicRecordsEntityRepo;
+
 
     /*@Autowired
        private AcademicRecordsEntityRepo academicRecordsEntityRepo;*/
@@ -126,7 +129,7 @@ public class IndexController {
             listingsRepo.save(le);
         }
         requestRepo.deleteAll();
-
+        academicRecordsEntityRepo.deleteAll();
         return bb;
     }
 
