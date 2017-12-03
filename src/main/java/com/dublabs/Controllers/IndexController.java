@@ -147,5 +147,32 @@ public class IndexController {
         return ResponseEntity.ok(str.size());
     }
 
+    /*
+    export interface Assign {
+        CourseId:number;
+        InstructorId:number;
+    }*/
+    @GetMapping(value = "/assign", produces = {"application/json"})
+   // public ResponseEntity assignInstructor(@RequestBody Requests requests, HttpResponse httpResponse) {
+    public Blackboard assign(){
+    	 Blackboard bb = new Blackboard();
+        ArrayList<String> str = new ArrayList<>();
+        str.add("dsfsadf");
+        str.add("sdfsad");
+        Integer instructorId=2;
+        Integer insToBeChanged=3;
+       // List<RequestsEntity> studentRequest=requests.getRequests();
+        //get the course ID from json. check if the course is assigned to different instructor
+        // if yes update with null and save the course for new instructor from the json.
+       //InstructorsEntity inst =instructorsRepo.findByCourse_id(202);
+       System.out.println("\n2.findby course Id...");
+       InstructorsEntity instructorToBeChanged =null;
+       for (InstructorsEntity instructor : instructorsRepo.findByCourse_id(202)) {
+           System.out.println("Course: "+instructor);
+           instructorToBeChanged=instructor;
+       }
+          
+        return bb;//ResponseEntity.ok(str.size());
+    }
 
 }
