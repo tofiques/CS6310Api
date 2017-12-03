@@ -159,17 +159,40 @@ public class IndexController {
         ArrayList<String> str = new ArrayList<>();
         str.add("dsfsadf");
         str.add("sdfsad");
-        Integer instructorId=2;
-        Integer insToBeChanged=3;
+        Integer instructorId=3;
+        //Integer insToBeChanged=2;
+        Integer courseId=202;
+        InstructorsEntity courseInstructor=null;
        // List<RequestsEntity> studentRequest=requests.getRequests();
         //get the course ID from json. check if the course is assigned to different instructor
         // if yes update with null and save the course for new instructor from the json.
        //InstructorsEntity inst =instructorsRepo.findByCourse_id(202);
        System.out.println("\n2.findby course Id...");
+       String message="";
        InstructorsEntity instructorToBeChanged =null;
-       for (InstructorsEntity instructor : instructorsRepo.findByCourse_id(202)) {
-           System.out.println("Course: "+instructor);
-           instructorToBeChanged=instructor;
+       for (InstructorsEntity instructor : instructorsRepo.findByCourse_id(courseId)) {
+           System.out.println("Course 11: "+instructor.getInstr_name());
+          // instructorToBeChanged=instructor;
+           courseInstructor=instructor;
+         
+       }
+       if(courseInstructor!=null)
+       if(courseInstructor.getInstructor_id().equals(instructorToBeChanged)){
+    	   message="Already assigned to the Instructor "+courseInstructor.getInstr_name();
+       }
+       else
+       {
+    	   courseInstructor.setCourse_id(0);
+    	   instructorsRepo.save(courseInstructor);
+    	   for (InstructorsEntity updateInstructor : instructorsRepo.findByInstructor_id(instructorId)) {
+               System.out.println("Course: "+updateInstructor.getInstr_name());
+              // instructorToBeChanged=instructor;
+               updateInstructor.setCourse_id(courseId);
+        	   instructorsRepo.save(updateInstructor);
+        	   message= "Instructor "+courseInstructor.getInstr_name()+" is Assigned to course "+courseId;
+             
+           }
+    	  
        }
           
         return bb;//ResponseEntity.ok(str.size());

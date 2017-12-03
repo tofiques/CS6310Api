@@ -16,6 +16,6 @@ public interface InstructorsRepo extends CrudRepository<InstructorsEntity,Intege
 
 	@Query("SELECT   p from InstructorsEntity p where p.course_id = :courseId")
 	List<InstructorsEntity> findByCourse_id(Integer courseId); 
-	@Query("SELECT   p from InstructorsEntity p where p.instructor_id = :InstructorId")
+	@Query("SELECT   p from InstructorsEntity p where p.instructor_id = :instructorId")
 	List<InstructorsEntity> findByInstructor_id(Integer instructorId);
 }
