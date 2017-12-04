@@ -180,20 +180,20 @@ public class IndexController {
        if(courseInstructor.getInstructor_id().equals(instructorToBeChanged)){
     	   message="Already assigned to the Instructor "+courseInstructor.getInstr_name();
        }
-       else
+       else if (courseInstructor.getCourse_id()!=null)
        {
-    	   courseInstructor.setCourse_id(0);
-    	   instructorsRepo.save(courseInstructor);
+    	   //courseInstructor.setCourse_id(0);
+    	   //instructorsRepo.save(courseInstructor);
+    	   message="Couser "+courseInstructor.getCourse_id()+" Already assigned to the Instructor "+courseInstructor.getInstr_name();
+       }
+       else if(courseInstructor.getCourse_id()==null ||courseInstructor.getCourse_id().equals(null)){
     	   for (InstructorsEntity updateInstructor : instructorsRepo.findByInstructor_id(instructorId)) {
                System.out.println("Course: "+updateInstructor.getInstr_name());
               // instructorToBeChanged=instructor;
                updateInstructor.setCourse_id(courseId);
         	   instructorsRepo.save(updateInstructor);
         	   message= "Instructor "+courseInstructor.getInstr_name()+" is Assigned to course "+courseId;
-             
-           }
-    	  
-       }
+    	   } 
           
         return bb;//ResponseEntity.ok(str.size());
     }
