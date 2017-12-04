@@ -137,7 +137,7 @@ public class IndexController {
         requestRepo.deleteAll();
         academicRecordsEntityRepo.deleteAll();
 
-        return ResponseEntity.ok("dfsd");
+        return ResponseEntity.ok(new ResponseMessage<String>("ok"));
     }
 
     @PostMapping(value = "/UploadRequests")
@@ -265,7 +265,7 @@ public class IndexController {
 
 
 
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(new ResponseMessage<String>(message));
 
     }
     @GetMapping(value = "/GetCurrentTerm", produces = {"application/json"})
