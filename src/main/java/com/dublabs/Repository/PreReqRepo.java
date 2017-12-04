@@ -16,4 +16,8 @@ public interface PreReqRepo extends CrudRepository<PrereqsEntity,Long> {
 
     @Query("SELECT  p.prereqCourseId from PrereqsEntity p where p.courseId= :courseId")
     List<PrereqsEntity> findByCourseId( @Param("courseId") Integer courseId);
+
+
+    @Query("SELECT  p.prereqCourseId from PrereqsEntity p where p.courseId= :courseId")
+    List<Integer> findByCourseIdforPreRec( @Param("courseId") Integer courseId);
 }
