@@ -3,6 +3,8 @@ package com.dublabs.Controllers;
 
 import com.dublabs.Domain.*;
 import com.dublabs.Repository.*;
+import com.dublabs.utils.CourseValidationRequestRepository;
+
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -149,9 +151,11 @@ public class IndexController {
         str.add("sdfsad");
         List<RequestsEntity> studentRequest=requests.getRequests();
         for(RequestsEntity re: studentRequest){
-
             requestRepo.save(re);
         }
+         // Start validating the request with business rules.
+        CourseValidationRequestRepository validate = new CourseValidationRequestRepository();
+        validate.processRequests();
         return ResponseEntity.ok(new ResponseMessage<String>("ok"));
     }
     

@@ -56,6 +56,7 @@ public class CourseValidationRequestRepository {
 	public List<String> processRequests() {
 
 		List<String> result = new ArrayList<String>();	
+		List<RequestsEntity> grantedRequest = new ArrayList<RequestsEntity>();
 		result.add("request processing");
 		
 		boolean hasPreqs;
@@ -70,6 +71,8 @@ public class CourseValidationRequestRepository {
 			// meets requirements
 			if (courseOffered && hasPreqs) {
 				result.add(message + "granted");
+				// add granted request to the list
+				grantedRequest.add(request);
 				continue;
 			}
 
@@ -85,8 +88,58 @@ public class CourseValidationRequestRepository {
 				continue;
 			}
 		}
+		//split the array in to .35 "A",.45 "B",.15 "C" and .5"D".
+	   saveAcademicRecordsByGrade(grantedRequest);
+		
 
 		return result;
+	}
+/**
+ * 
+ * @param grantedRequest
+ */
+	private void saveAcademicRecordsByGrade(List<RequestsEntity> grantedRequest) {
+		// TODO Auto-generated method stub
+		String[] grades={"A","B","C","D"};
+		double[] percentage={35.0F,45.0F,15.0F,5.0F};
+		int totalLength=grantedRequest.size();
+		
+		for(int j=0 ;j<grades.length;j++){
+		int grade = (int) Math.round((double)(totalLength*(percentage[j]/100.0f)));
+		System.out.println("Grade"+grades[j]+" === "+grade);
+		int initalsize=0;
+		int nextrange=initalsize+grade;
+		List<RequestsEntity> sublist=grantedRequest.subList(initalsize, nextrange);
+		System.out.println("Sublist Grade"+grades[j]+"-- "+sublist.size());
+		createAcademicRecords(sublist,grades[j]);
+		
+		}
+		
+	}
+/**
+ * 
+ * @param sublist
+ * @param grade
+ */
+	private void createAcademicRecords(List<RequestsEntity> sublist,String grade) {
+		// TODO Auto-generated method stub
+		List<AcademicRecordsEntity> academicEntityRecs = new ArrayList<AcademicRecordsEntity>();
+		AcademicRecordsEntity academic=null;
+		System.out.println(" Saving Academics Recodrs saved for Grade"+grade);
+		for(RequestsEntity courseRequest:sublist)
+		{
+			academic = new AcademicRecordsEntity();
+			academic.setCouesTerm(3);
+			academic.setCourseYear(2017);
+			academic.setCourseId(courseRequest.getCourseId());
+			academic.setStudentId(courseRequest.getStudentId());
+			academic.setStudentGrade(grade);
+			academicEntityRecs.add(academic);	
+		}
+		
+		academicRecordsEntityRepo.save(academicEntityRecs);
+		System.out.println("Completd Academics Recodrs saving for Grade"+grade);
+		
 	}
 
 	@SuppressWarnings("null")
