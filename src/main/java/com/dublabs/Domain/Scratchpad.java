@@ -77,9 +77,9 @@ public class Scratchpad {
            // Toufiq local work reader comment the below line 
            ClassPathResource cpr = new ClassPathResource("./"+fileToParse);
            InputStream is = cpr.getInputStream();
-           
-          
            fileReader = new BufferedReader(new InputStreamReader(is));
+           /// comment till here
+           
             // Read the file line by line
             while ((line = fileReader.readLine()) != null) {
                 // Get all tokens available in line
