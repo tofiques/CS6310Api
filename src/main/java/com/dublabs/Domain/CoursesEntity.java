@@ -11,8 +11,23 @@ public class CoursesEntity {
     private int courseId;
     private String courseTitle;
     private Double courseCost;
+    private transient InstructorsEntity instructor;
 
-    public CoursesEntity() {
+    /**
+	 * @return the instructor
+	 */
+	public InstructorsEntity getInstructor() {
+		return instructor;
+	}
+
+	/**
+	 * @param instructor the instructor to set
+	 */
+	public void setInstructor(InstructorsEntity instructor) {
+		this.instructor = instructor;
+	}
+
+	public CoursesEntity() {
     }
 
     public CoursesEntity(int courseId, String courseTitle, Double courseCost) {
