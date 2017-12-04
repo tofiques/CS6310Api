@@ -2,7 +2,11 @@ package com.dublabs.Repository;
 
 import com.dublabs.Domain.AcademicRecordsEntity;
 
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public  interface AcademicRecordsEntityRepo extends CrudRepository<AcademicRecordsEntity,Long> {
 
-
+	@Query("SELECT   p from AcademicRecordsEntity p where p.student_id = :studentId")
+	List<AcademicRecordsEntity> findByStudentId(@Param("studentId")Integer studentId);
 
 }
