@@ -79,7 +79,7 @@ public class IndexController {
     }
 
 
-    @GetMapping(value = "/ins", produces = {"application/json"})
+    @GetMapping(value = "/initDb")
     public ResponseEntity ins() {
         Blackboard bb = new Blackboard();
         ArrayList<CoursesEntity> coursesEntities;
@@ -138,6 +138,7 @@ public class IndexController {
         }
         requestRepo.deleteAll();
         academicRecordsEntityRepo.deleteAll();
+
         return ResponseEntity.ok("OK");
     }
 
@@ -157,18 +158,19 @@ public class IndexController {
     }
     
     @GetMapping(value = "/GetCourses", produces = {"application/json"})
-     public List<CoursesEntity> getCourses(@RequestBody Requests requests, HttpResponse httpResponse) {
+     public List<CoursesEntity> getCourses() {
    
     	// Get All courses 
      List <CoursesEntity> courses= (List<CoursesEntity>) coursesEntityRepo.findAll();
      List <CoursesEntity> coursesInstrs =new ArrayList<CoursesEntity>();
-     for (CoursesEntity course :courses){
-     InstructorsEntity instructor = instructorsRepo.findByCourse_id(course.getCourseId());
-       if (instructor!=null)
-    	   course.setInstructor(instructor);
-       coursesInstrs.add(course);    
-     
-     }
+        for (CoursesEntity course :courses){
+            InstructorsEntity instructor = instructorsRepo.findByCourse_id(course.getCourseId());
+            if (instructor!=null) {
+                course.setInstructor(instructor);
+            }
+            coursesInstrs.add(course);
+
+        }
      	 
      	return coursesInstrs;
      	 
@@ -191,6 +193,7 @@ public class IndexController {
        InstructorsEntity instructorToBeChanged =null;
            
            courseInstructor= instructorsRepo.findByCourse_id(courseId);
+
            System.out.println("Course 11: "+courseInstructor.getInstr_name());
        if(courseInstructor!=null)
        if(courseInstructor.getInstructor_id().equals(instructorToBeChanged)){

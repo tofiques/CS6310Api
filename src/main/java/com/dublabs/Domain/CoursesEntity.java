@@ -1,6 +1,9 @@
 package com.dublabs.Domain;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by tofiques on 11/30/17.
@@ -11,23 +14,26 @@ public class CoursesEntity {
     private int courseId;
     private String courseTitle;
     private Double courseCost;
-    private transient InstructorsEntity instructor;
+
+    private List<Integer> prereq;
+
+    private  InstructorsEntity instructor;
 
     /**
-	 * @return the instructor
-	 */
-	public InstructorsEntity getInstructor() {
-		return instructor;
-	}
+     * @return the instructor
+     */
+    @Transient
+    public InstructorsEntity getInstructor() {
+        return instructor;
+    }
 
-	/**
-	 * @param instructor the instructor to set
-	 */
-	public void setInstructor(InstructorsEntity instructor) {
-		this.instructor = instructor;
-	}
-
-	public CoursesEntity() {
+    /**
+     * @param instructor the instructor to set
+     */
+    public void setInstructor(InstructorsEntity instructor) {
+        this.instructor = instructor;
+    }
+    public CoursesEntity() {
     }
 
     public CoursesEntity(int courseId, String courseTitle, Double courseCost) {
@@ -78,6 +84,14 @@ public class CoursesEntity {
         if (courseCost != null ? !courseCost.equals(that.courseCost) : that.courseCost != null) return false;
 
         return true;
+    }
+    @Transient
+    public List<Integer> getPrereq() {
+        return prereq;
+    }
+
+    public void setPrereq(List<Integer> prereq) {
+        this.prereq = prereq;
     }
 
     @Override
