@@ -5,13 +5,11 @@ import com.dublabs.Domain.*;
 import com.dublabs.Repository.*;
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -139,7 +137,7 @@ public class IndexController {
         requestRepo.deleteAll();
         academicRecordsEntityRepo.deleteAll();
 
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.ok("dfsd");
     }
 
     @PostMapping(value = "/UploadRequests")
@@ -161,19 +159,17 @@ public class IndexController {
      public List<CoursesEntity> getCourses() {
    
     	// Get All courses 
-     List <CoursesEntity> courses= (List<CoursesEntity>) coursesEntityRepo.findAll();
-     List <CoursesEntity> coursesInstrs =new ArrayList<CoursesEntity>();
-        for (CoursesEntity course :courses){
-            InstructorsEntity instructor = instructorsRepo.findByCourse_id(course.getCourseId());
-            if (instructor!=null) {
-                course.setInstructor(instructor);
-            }
-            coursesInstrs.add(course);
+     List <CoursesEntity> courses= coursesEntityRepo.getAll();
 
-        }
      	 
-     	return coursesInstrs;
+     	return courses;
      	 
+    } @GetMapping(value = "/GetInstructors", produces = {"application/json"})
+     public List<InstructorsEntity> getInstructors() {
+   List<InstructorsEntity> instructorsEntities=instructorsRepo.getAll();
+
+     	return instructorsEntities;
+
     }
 
     /*
@@ -182,40 +178,95 @@ public class IndexController {
         InstructorId:number;
     }*/
     @GetMapping(value = "/AssignInstructor", produces = {"application/json"})
-   public ResponseEntity assignInstructor(@RequestBody Integer instructorId,@RequestBody Integer courseId, HttpResponse httpResponse) {
-   // public Blackboard assign(){
-    	 Blackboard bb = new Blackboard();
-        InstructorsEntity courseInstructor=null;
-       // List<RequestsEntity> studentRequest=requests.getRequests();
-        //get the course ID from json. check if the course is assigned to different instructor
-        System.out.println("findby course Id...");
-       String message="";
-       InstructorsEntity instructorToBeChanged =null;
-           
-           courseInstructor= instructorsRepo.findByCourse_id(courseId);
 
-           System.out.println("Course 11: "+courseInstructor.getInstr_name());
-       if(courseInstructor!=null)
-       if(courseInstructor.getInstructor_id().equals(instructorToBeChanged)){
-    	   message="Already assigned to the Instructor "+courseInstructor.getInstr_name();
-       }
-       else if (courseInstructor.getCourse_id()!=null)
-       {
-    	   //courseInstructor.setCourse_id(0); updated
-    	   //instructorsRepo.save(courseInstructor);
-    	   message="Couser "+courseInstructor.getCourse_id()+" Already assigned to the Instructor "+courseInstructor.getInstr_name();
-       }
-       else if(courseInstructor.getCourse_id()==null ||courseInstructor.getCourse_id().equals(null)){
-    	   for (InstructorsEntity updateInstructor : instructorsRepo.findByInstructor_id(instructorId)) {
-               System.out.println("Course: "+updateInstructor.getInstr_name());
-              // instructorToBeChanged=instructor;
-               updateInstructor.setCourse_id(courseId);
-        	   instructorsRepo.save(updateInstructor);
-        	   message= "Instructor "+courseInstructor.getInstr_name()+" is Assigned to course "+courseId;
-    	   } 
-       }
-          
+    public ResponseEntity assignInstructor(@RequestBody Integer instructorId,@RequestBody Integer courseId, HttpResponse httpResponse) {
+
+        // public Blackboard assign(){
+
+        Blackboard bb = new Blackboard();
+
+        InstructorsEntity courseInstructor=null;
+
+        // List<RequestsEntity> studentRequest=requests.getRequests();
+
+        //get the course ID from json. check if the course is assigned to different instructor
+
+        System.out.println("findby course Id...");
+
+        String message="";
+
+        boolean assigned=false;
+
+        InstructorsEntity instructorToBeChanged =null;
+
+        courseInstructor= instructorsRepo.findByCourse_id(courseId);
+
+        if(courseInstructor==null){
+
+            for (InstructorsEntity updateInstructor1 : instructorsRepo.findByInstructor_id(instructorId)) {
+
+                System.out.println("Course: "+updateInstructor1.getName());
+
+                // instructorToBeChanged=instructor;
+
+                updateInstructor1.setCourseId(courseId);
+
+                instructorsRepo.save(updateInstructor1);
+
+                message= "Instructor "+updateInstructor1.getInstructorId()+" is Assigned to course "+courseId;
+
+                assigned=true;
+
+            }
+
+        }
+
+
+
+
+
+        if(courseInstructor!=null & !assigned)
+
+            if(courseInstructor.getInstructorId().equals(instructorToBeChanged)){
+
+                message="Already assigned to the Instructor "+courseInstructor.getName();
+
+            }
+
+            else if (courseInstructor.getCourseId()!=null)
+
+            {
+
+                //courseInstructor.setCourse_id(0); updated
+
+                //instructorsRepo.save(courseInstructor);
+
+                message="Couser "+courseInstructor.getCourseId()+" Already assigned to the Instructor "+courseInstructor.getName();
+
+            }
+
+            else if(courseInstructor.getCourseId()==null ||courseInstructor.getCourseId().equals(null)){
+
+                for (InstructorsEntity updateInstructor : instructorsRepo.findByInstructor_id(instructorId)) {
+
+                    System.out.println("Course: "+updateInstructor.getName());
+
+                    // instructorToBeChanged=instructor;
+
+                    updateInstructor.setCourseId(courseId);
+
+                    instructorsRepo.save(updateInstructor);
+
+                    message= "Instructor "+courseInstructor.getName()+" is Assigned to course "+courseId;
+
+                }
+
+            }
+
+
+
         return ResponseEntity.ok(message);
+
     }
     @GetMapping(value = "/GetCurrentTerm", produces = {"application/json"})
     public Term getTerm() {

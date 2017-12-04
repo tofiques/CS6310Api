@@ -1,5 +1,6 @@
 package com.dublabs.Domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -8,61 +9,69 @@ import javax.persistence.Table;
 @Table(name = "instructors", schema = "csassignment")
 public class InstructorsEntity {
 
- @Id
- private Integer instructor_id;
-  private String instr_name;
-  private String office_hours;
-  private String email;
-  private Integer course_id;
+    @Id
+    @Column(name = "instructor_id")
+    private Integer instructorId;
+    @Column(name = "instr_name")
+    private String name;
+    @Column(name = "office_hours")
+    private String availability;
 
-  public InstructorsEntity(Integer instructor_id, String instr_name, String office_hours, String email, Integer course_id) {
-    this.instructor_id = instructor_id;
-    this.instr_name = instr_name;
-    this.office_hours = office_hours;
-    this.email = email;
-    this.course_id = course_id;
-  }
+    @Column(name = "email")
+    private String email;
 
-  public InstructorsEntity() {
-  }
+    @Column(name = "course_id")
+    private Integer courseId;
 
-  public Integer getInstructor_id() {
-    return instructor_id;
-  }
+    public InstructorsEntity(Integer instructorId, String name, String availability, String email, Integer courseId) {
+        this.instructorId = instructorId;
+        this.name = name;
+        this.availability = availability;
+        this.email = email;
+        this.courseId = courseId;
+    }
 
-  public void setInstructor_id(Integer instructor_id) {
-    this.instructor_id = instructor_id;
-  }
+    public InstructorsEntity() {
+    }
 
-  public String getInstr_name() {
-    return instr_name;
-  }
 
-  public void setInstr_name(String instr_name) {
-    this.instr_name = instr_name;
-  }
+    public Integer getInstructorId() {
+        return instructorId;
+    }
 
-  public String getOffice_hours() {
-    return office_hours;
-  }
+    public void setInstructorId(Integer instructor_id) {
+        this.instructorId = instructor_id;
+    }
 
-  public void setOffice_hours(String office_hours) {
-    this.office_hours = office_hours;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getEmail() {
-    return email;
-  }
+    public void setName(String instr_name) {
+        this.name = instr_name;
+    }
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
+    public String getAvailability() {
+        return availability;
+    }
 
-  public Integer getCourse_id() {
-    return course_id;
-  }
+    public void setAvailability(String office_hours) {
+        this.availability = office_hours;
+    }
 
-  public void setCourse_id(Integer course_id) {
-    this.course_id = course_id;
-  }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer course_id) {
+        this.courseId = course_id;
+    }
 }
