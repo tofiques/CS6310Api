@@ -5,7 +5,11 @@ package com.dublabs.Domain;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
+
+import org.springframework.core.io.ClassPathResource;
 
 public class Scratchpad {
 
@@ -67,9 +71,15 @@ public class Scratchpad {
         final String DELIMITER = ",";
         try {
             String line = "";
-            // Create the file reader
-            fileReader = new BufferedReader(new FileReader(fileToParse));
-
+         // Create the file reader
+            // Tofique local reader uncomment the below line 
+          // fileReader = new BufferedReader(new FileReader(fileToParse));
+           // Toufiq local work reader comment the below line 
+           ClassPathResource cpr = new ClassPathResource("./"+fileToParse);
+           InputStream is = cpr.getInputStream();
+           fileReader = new BufferedReader(new InputStreamReader(is));
+           /// comment till here
+           
             // Read the file line by line
             while ((line = fileReader.readLine()) != null) {
                 // Get all tokens available in line

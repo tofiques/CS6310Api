@@ -12,6 +12,41 @@ public class AcademicRecordsEntity {
     private Integer courseYear;
     private Integer couesTerm;
     private int id;
+    private Integer studentId;
+	private Integer courseId;
+	
+	 /**
+		 * @return the studentId
+		 */
+	    @Basic
+	    @Column(name = "student_id")
+		public Integer getStudentId() {
+			return studentId;
+		}
+
+		/**
+		 * @param studentId the studentId to set
+		 */
+		public void setStudentId(Integer studentId) {
+			this.studentId = studentId;
+		}
+
+		/**
+		 * @return the courseId
+		 */
+		@Basic
+	    @Column(name = "course_id")
+		public Integer getCourseId() {
+			return courseId;
+		}
+
+		/**
+		 * @param courseId the courseId to set
+		 */
+		public void setCourseId(Integer courseId) {
+			this.courseId = courseId;
+		}
+
 
     @Basic
     @Column(name = "student_grade")
