@@ -104,7 +104,7 @@ public class IndexController {
         coursesEntities = managementConsole.getCourses();
         for (CoursesEntity c :
                 coursesEntities) {
-           List<Integer> preReq= preReqRepo.findByCourseId(c.getCourseId());
+           List<Integer> preReq= preReqRepo.findByCourseIdforPreRec(c.getCourseId());
            if(!preReq.isEmpty() && preReq!=null) {
                c.setPrereq(preReq);
            }

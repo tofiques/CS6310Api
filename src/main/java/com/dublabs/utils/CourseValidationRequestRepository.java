@@ -155,7 +155,7 @@ public class CourseValidationRequestRepository {
 		List<CoursesEntity> passedCourses = getPassedCourses(student);
 
 		// fail on first
-		List<PrereqsEntity> preReqs = preReqRepo.findByCourseIdEntity(course.getCourseId());
+		List<PrereqsEntity> preReqs = preReqRepo.findByCourseId(course.getCourseId());
 		if(preReqs!=null ||preReqs.size()>0)
 		for (PrereqsEntity preReq : preReqs) {
 			if (!passedCourses.stream().anyMatch(x -> x.getCourseId() == preReq.getCourseId())) {
