@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -52,12 +53,14 @@ public class IndexController {
     @Autowired
     private  AcademicRecordsEntityRepo academicRecordsEntityRepo;
 
+    private Integer count=0;
+
 
     /*@Autowired
        private AcademicRecordsEntityRepo academicRecordsEntityRepo;*/
     @GetMapping(value = "/test", produces = {"application/json"})
     public Blackboard index() {
-
+        count=0;
         ResultSet resultSet = null;
         Blackboard bb = new Blackboard();
         bb.setUrl("fsdfsd");
@@ -77,7 +80,7 @@ public class IndexController {
 
 
     @GetMapping(value = "/ins", produces = {"application/json"})
-    public Blackboard ins() {
+    public ResponseEntity ins() {
         Blackboard bb = new Blackboard();
         ArrayList<CoursesEntity> coursesEntities;
         ArrayList<InstructorsEntity> instructorsEntities;
@@ -93,9 +96,18 @@ public class IndexController {
             managementConsole.uploadFileContents(nextFileName);
 
         }
+        prereqsEntities = managementConsole.getPrereqsEntities();
+        for (PrereqsEntity prereqsEntity : prereqsEntities) {
+            preReqRepo.save(prereqsEntity);
+
+        }
         coursesEntities = managementConsole.getCourses();
         for (CoursesEntity c :
                 coursesEntities) {
+           List<Integer> preReq= preReqRepo.findByCourseId(c.getCourseId());
+           if(!preReq.isEmpty() && preReq!=null) {
+               c.setPrereq(preReq);
+           }
             coursesEntityRepo.save(c);
         }
         instructorsEntities = managementConsole.getInstructors();
@@ -110,11 +122,7 @@ public class IndexController {
             studentsRepo.save(stu);
         }
 
-        prereqsEntities = managementConsole.getPrereqsEntities();
-        for (PrereqsEntity prereqsEntity : prereqsEntities) {
-            preReqRepo.save(prereqsEntity);
 
-        }
 
 
         degreePrograms=managementConsole.getDegreePrograms();
@@ -130,12 +138,13 @@ public class IndexController {
         }
         requestRepo.deleteAll();
         academicRecordsEntityRepo.deleteAll();
-        return bb;
+        return ResponseEntity.ok("OK");
     }
 
-    @PostMapping(value = "/uploadRequests")
+    @PostMapping(value = "/UploadRequests")
     public ResponseEntity uploadRequests(@RequestBody Requests requests, HttpResponse httpResponse) {
         Blackboard bb = null;
+        count++;
         ArrayList<String> str = new ArrayList<>();
         str.add("dsfsadf");
         str.add("sdfsad");
@@ -144,7 +153,7 @@ public class IndexController {
 
             requestRepo.save(re);
         }
-        return ResponseEntity.ok(str.size());
+        return ResponseEntity.ok(str);
     }
     
     @GetMapping(value = "/GetCourses", produces = {"application/json"})
@@ -205,5 +214,14 @@ public class IndexController {
           
         return ResponseEntity.ok(message);
     }
+    @GetMapping(value = "/GetCurrentTerm", produces = {"application/json"})
+    public Term getTerm() {
 
+
+        return new Term(getCount());
+    }
+
+    public Integer getCount() {
+        return count;
+    }
 }

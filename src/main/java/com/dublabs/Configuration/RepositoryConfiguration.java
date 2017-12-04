@@ -1,4 +1,4 @@
-/*
+
 package com.dublabs.Configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +10,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 
-*/
 /**
  * Created by tofiques on 2/11/17.
- *//*
+ */
 
 @Configuration
 @EnableAutoConfiguration
@@ -28,4 +27,4 @@ public class RepositoryConfiguration {
 
 
 }
-*/
+
