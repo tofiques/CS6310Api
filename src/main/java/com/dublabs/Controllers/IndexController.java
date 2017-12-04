@@ -182,7 +182,7 @@ public class IndexController {
        }
        else if (courseInstructor.getCourse_id()!=null)
        {
-    	   //courseInstructor.setCourse_id(0);
+    	   //courseInstructor.setCourse_id(0); updated
     	   //instructorsRepo.save(courseInstructor);
     	   message="Couser "+courseInstructor.getCourse_id()+" Already assigned to the Instructor "+courseInstructor.getInstr_name();
        }
@@ -194,6 +194,7 @@ public class IndexController {
         	   instructorsRepo.save(updateInstructor);
         	   message= "Instructor "+courseInstructor.getInstr_name()+" is Assigned to course "+courseId;
     	   } 
+       }
           
         return bb;//ResponseEntity.ok(str.size());
     }
