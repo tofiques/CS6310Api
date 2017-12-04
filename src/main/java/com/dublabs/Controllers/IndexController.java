@@ -152,19 +152,27 @@ public class IndexController {
 
             requestRepo.save(re);
         }
-        return ResponseEntity.ok(str);
+        return ResponseEntity.ok(new ResponseMessage<String>("ok"));
     }
     
     @GetMapping(value = "/GetCourses", produces = {"application/json"})
      public List<CoursesEntity> getCourses() {
-   
-    	// Get All courses 
-     List <CoursesEntity> courses= coursesEntityRepo.getAll();
 
+        List <CoursesEntity> courses= (List<CoursesEntity>) coursesEntityRepo.findAll();
+        List <CoursesEntity> coursesInstrs =new ArrayList<CoursesEntity>();
+        for (CoursesEntity course :courses){
+            InstructorsEntity instructor = instructorsRepo.findByCourse_id(course.getCourseId());
+            if (instructor!=null) {
+                course.setInstructor(instructor);
+            }
+            coursesInstrs.add(course);
+
+        }
+
+        return coursesInstrs;
      	 
-     	return courses;
-     	 
-    } @GetMapping(value = "/GetInstructors", produces = {"application/json"})
+    }
+    @GetMapping(value = "/GetInstructors", produces = {"application/json"})
      public List<InstructorsEntity> getInstructors() {
    List<InstructorsEntity> instructorsEntities=instructorsRepo.getAll();
 
@@ -179,44 +187,91 @@ public class IndexController {
     }*/
     @PostMapping(value = "/AssignInstructor")
    public ResponseEntity assignInstructor(@RequestBody Assign assign) {
-   // public Blackboard assign(){
-        Integer instructorId = assign.getInstructorId();
+        Blackboard bb = new Blackboard();
         Integer courseId=assign.getCourseId();
-    	 Blackboard bb = new Blackboard();
+        Integer instructorId=assign.getInstructorId();
         InstructorsEntity courseInstructor=null;
-       // List<RequestsEntity> studentRequest=requests.getRequests();
+
+        // List<RequestsEntity> studentRequest=requests.getRequests();
+
         //get the course ID from json. check if the course is assigned to different instructor
+
         System.out.println("findby course Id...");
-       String message="xvxcvx";
-       InstructorsEntity instructorToBeChanged =null;
-           
-           courseInstructor= instructorsRepo.findByCourse_id(courseId);
 
-         //  System.out.println("Course 11: "+courseInstructor.getName());
-       if(courseInstructor!=null)
-       if(courseInstructor.getInstructorId().equals(instructorToBeChanged)){
-    	   message="Already assigned to the Instructor "+courseInstructor.getName();
-       }
-       else if (courseInstructor.getCourseId()!=null)
-       {
-    	   //courseInstructor.setCourse_id(0); updated
-    	   //instructorsRepo.save(courseInstructor);
-    	   message="Couser "+courseInstructor.getCourseId()+" Already assigned to the Instructor "+courseInstructor.getName();
-       }
-       else if(courseInstructor.getCourseId()==null ||courseInstructor.getCourseId().equals(null)){
-    	   for (InstructorsEntity updateInstructor : instructorsRepo.findByInstructor_id(instructorId)) {
-               System.out.println("Course: "+updateInstructor.getName());
-              // instructorToBeChanged=instructor;
-               updateInstructor.setCourseId(courseId);
-        	   instructorsRepo.save(updateInstructor);
-        	   message= "Instructor "+courseInstructor.getName()+" is Assigned to course "+courseId;
-    	   } 
-       }
-        ArrayList<String> str = new ArrayList<>();
-        str.add("dsfsadf");
+        String message="";
+
+        boolean assigned=false;
+
+        InstructorsEntity instructorToBeChanged =null;
+
+        courseInstructor= instructorsRepo.findByCourse_id(courseId);
+
+        if(courseInstructor==null){
+
+            for (InstructorsEntity updateInstructor1 : instructorsRepo.findByInstructor_id(instructorId)) {
+
+                System.out.println("Course: "+updateInstructor1.getName());
+
+                // instructorToBeChanged=instructor;
+
+                updateInstructor1.setCourseId(courseId);
+
+                instructorsRepo.save(updateInstructor1);
+
+                message= "Instructor "+updateInstructor1.getName()+" is Assigned to course "+courseId;
+
+                assigned=true;
+
+            }
+
+        }
 
 
-        return ResponseEntity.ok(new ResponseMessage<String>("testing"));
+
+
+
+        if(courseInstructor!=null & !assigned)
+
+            if(courseInstructor.getName().equals(instructorToBeChanged)){
+
+                message="Already assigned to the Instructor "+courseInstructor.getName();
+
+            }
+
+            else if (courseInstructor.getCourseId()!=null)
+
+            {
+
+                //courseInstructor.setCourse_id(0); updated
+
+                //instructorsRepo.save(courseInstructor);
+
+                message="Couser "+courseInstructor.getCourseId()+" Already assigned to the Instructor "+courseInstructor.getName();
+
+            }
+
+            else if(courseInstructor.getCourseId()==null ||courseInstructor.getCourseId().equals(null)){
+
+                for (InstructorsEntity updateInstructor : instructorsRepo.findByInstructor_id(instructorId)) {
+
+                    System.out.println("Course: "+updateInstructor.getName());
+
+                    // instructorToBeChanged=instructor;
+
+                    updateInstructor.setCourseId(courseId);
+
+                    instructorsRepo.save(updateInstructor);
+
+                    message= "Instructor "+courseInstructor.getName()+" is Assigned to course "+courseId;
+
+                }
+
+            }
+
+
+
+
+        return ResponseEntity.ok(new ResponseMessage<String>(message));
     }
     @GetMapping(value = "/GetCurrentTerm", produces = {"application/json"})
     public Term getTerm() {
