@@ -70,3 +70,8 @@ CREATE TABLE `students` (
   PRIMARY KEY (`student_id`),
   KEY `terminx` (`student_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `term` (
+  `term_id` int(11) NOT NULL,
+  PRIMARY KEY (`term_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
