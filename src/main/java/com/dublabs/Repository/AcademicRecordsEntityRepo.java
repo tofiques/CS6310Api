@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public  interface AcademicRecordsEntityRepo extends CrudRepository<AcademicRecordsEntity,Long> {
 
-	@Query("SELECT   p from AcademicRecordsEntity p where p.student_id = :studentId")
+	@Query("SELECT   p from AcademicRecordsEntity p where p.studentId = :studentId")
 	List<AcademicRecordsEntity> findByStudentId(@Param("studentId")Integer studentId);
 
 }
