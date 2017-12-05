@@ -40,7 +40,7 @@ public class CourseValidationRequestRepository {
     private AcademicRecordsEntityRepo academicRecordsEntityRepo;
 
 
-    public List<String> processRequests() {
+    public List<String> processRequests(Integer termCount) {
 
         List<String> result = new ArrayList<String>();
         List<RequestsEntity> grantedRequest = new ArrayList<RequestsEntity>();
@@ -76,7 +76,7 @@ public class CourseValidationRequestRepository {
             }
         }
         //split the array in to .35 "A",.45 "B",.15 "C" and .5"D".
-        saveAcademicRecordsByGrade(grantedRequest);
+        saveAcademicRecordsByGrade(grantedRequest,termCount);
 
 
         return result;
@@ -84,8 +84,9 @@ public class CourseValidationRequestRepository {
 
     /**
      * @param grantedRequest
+     * @param termCount 
      */
-    private void saveAcademicRecordsByGrade(List<RequestsEntity> grantedRequest) {
+    private void saveAcademicRecordsByGrade(List<RequestsEntity> grantedRequest, Integer termCount) {
         // TODO Auto-generated method stub
         String[] grades = {"A", "B", "C", "D"};
         double[] percentage = {35.0F, 45.0F, 15.0F, 5.0F};
@@ -98,7 +99,7 @@ public class CourseValidationRequestRepository {
             int nextrange = initalsize + grade;
             List<RequestsEntity> sublist = grantedRequest.subList(initalsize, nextrange);
             System.out.println("Sublist Grade" + grades[j] + "-- " + sublist.size());
-            createAcademicRecords(sublist, grades[j]);
+            createAcademicRecords(sublist, grades[j],termCount);
 
         }
 
@@ -107,16 +108,17 @@ public class CourseValidationRequestRepository {
     /**
      * @param sublist
      * @param grade
+     * @param termCount 
      */
-    private void createAcademicRecords(List<RequestsEntity> sublist, String grade) {
+    private void createAcademicRecords(List<RequestsEntity> sublist, String grade, Integer termCount) {
         // TODO Auto-generated method stub
-        List<AcademicRecordsEntity> academicEntityRecs = new ArrayList<AcademicRecordsEntity>();
+       // List<AcademicRecordsEntity> academicEntityRecs = new ArrayList<AcademicRecordsEntity>();
 
         System.out.println(" Saving Academics Recodrs saved for Grade" + grade);
         for (RequestsEntity courseRequest : sublist) {
             AcademicRecordsEntity academic = new AcademicRecordsEntity();
-            academic.setCouesTerm(3);
-            academic.setCourseYear(2017);
+            academic.setCouesTerm(termCount);
+            //academic.setCourseYear(2017);
             academic.setCourseId(courseRequest.getCourseId());
             academic.setStudentId(courseRequest.getStudentId());
             academic.setStudentGrade(grade);

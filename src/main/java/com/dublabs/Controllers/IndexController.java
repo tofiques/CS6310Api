@@ -40,6 +40,9 @@ public class IndexController {
 
     @Autowired
     private  StudentsRepo studentsRepo;
+    
+    @Autowired
+    private  TermRepo termRepo;
 
     @Autowired
     private  PreReqRepo preReqRepo;
@@ -143,6 +146,7 @@ public class IndexController {
         }
         requestRepo.deleteAll();
         academicRecordsEntityRepo.deleteAll();
+        termRepo.deleteAll();
 
         return ResponseEntity.ok(new ResponseMessage<String>("ok"));
     }
@@ -162,8 +166,24 @@ public class IndexController {
             }
         }
          // Start validating the request with business rules.
+        Integer termCount=0;
+        Term requestTerm= termRepo.getMaxTerm();
+          if (requestTerm==null)
+          {
+        	  Term term= new Term();
+        	  term.setTermId(termCount);
+        	  termRepo.save(term);
+          }
+          else
+          {
+        	   termCount=requestTerm.getTermId();
+        	  Term term= new Term();
+        	  term.setTermId(termCount+1);
+        	  termRepo.save(term);
+        	  
+          }
 
-       List <String> messages= validate.processRequests();
+       List <String> messages= validate.processRequests(termCount);
 
         return ResponseEntity.ok(new ResponseMessage<List<String>>(messages));
     }
