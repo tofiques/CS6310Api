@@ -3,11 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.dublabs</groupId>
-    <artifactId>verifydemo</artifactId>
+    <groupId>edu.gatech</groupId>
+    <artifactId>coursemanagment</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>verifydemo</name>
+    <name>coursemanagment</name>
     <description>Demo project for Spring Boot</description>
 
     <parent>
@@ -22,7 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <start-class>com.dublabs.VerifydemoApplication</start-class>
+        <start-class>edu.gatech.CourseManagmentTool</start-class>
 
     </properties>
 
