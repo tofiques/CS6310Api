@@ -151,6 +151,7 @@ public class IndexController {
     public ResponseEntity uploadRequests(@RequestBody Requests requests, HttpResponse httpResponse) {
         Blackboard bb = null;
         count++;
+        requestRepo.deleteAll();
         ArrayList<String> str = new ArrayList<>();
         str.add("dsfsadf");
         str.add("sdfsad");
@@ -162,8 +163,9 @@ public class IndexController {
         }
          // Start validating the request with business rules.
 
-        validate.processRequests();
-        return ResponseEntity.ok(new ResponseMessage<String>("ok"));
+       List <String> messages= validate.processRequests();
+
+        return ResponseEntity.ok(new ResponseMessage<List<String>>(messages));
     }
     
     @GetMapping(value = "/GetCourses", produces = {"application/json"})

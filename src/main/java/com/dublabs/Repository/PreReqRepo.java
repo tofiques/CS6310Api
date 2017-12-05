@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface PreReqRepo extends CrudRepository<PrereqsEntity,Long> {
 
-    @Query("SELECT  p.prereqCourseId from PrereqsEntity p where p.courseId= :courseId")
+    @Query("SELECT  p from PrereqsEntity p where p.courseId= :courseId")
     List<PrereqsEntity> findByCourseId( @Param("courseId") Integer courseId);
 
 
