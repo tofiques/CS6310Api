@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by tofiques on 12/1/17.
  */
 @Entity
-@Table(name = "academic_records", schema = "csassignment", catalog = "")
+@Table(name = "academic_records", schema = "csassignment")
 public class AcademicRecordsEntity {
     private String studentGrade;
     private Integer courseYear;

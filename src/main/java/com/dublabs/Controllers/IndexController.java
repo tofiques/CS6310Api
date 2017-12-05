@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 ;
 
@@ -52,6 +54,9 @@ public class IndexController {
 
     @Autowired
     private  AcademicRecordsEntityRepo academicRecordsEntityRepo;
+
+    @Autowired
+    private CourseValidationRequestRepository validate;
 
     private Integer count=0;
 
@@ -139,7 +144,7 @@ public class IndexController {
         requestRepo.deleteAll();
         academicRecordsEntityRepo.deleteAll();
 
-        return ResponseEntity.ok("dfsd");
+        return ResponseEntity.ok(new ResponseMessage<String>("ok"));
     }
 
     @PostMapping(value = "/UploadRequests")
@@ -151,10 +156,12 @@ public class IndexController {
         str.add("sdfsad");
         List<RequestsEntity> studentRequest=requests.getRequests();
         for(RequestsEntity re: studentRequest){
-            requestRepo.save(re);
+            if(re.getStudentId()!=null && re.getCourseId()!=null) {
+                requestRepo.save(re);
+            }
         }
          // Start validating the request with business rules.
-        CourseValidationRequestRepository validate = new CourseValidationRequestRepository();
+
         validate.processRequests();
         return ResponseEntity.ok(new ResponseMessage<String>("ok"));
     }
@@ -183,7 +190,29 @@ public class IndexController {
      	return instructorsEntities;
 
     }
+    @GetMapping(value = "/RunWeka", produces = {"application/json"})
+    public ResponseEntity getRunWeka() {
 
+
+        Map<String, String[]> attrMap = new HashMap<String, String[]>();
+
+        // TODO do as a for each and grab from DB
+        attrMap.put("Course1", new String[]{"Taken", "None"});
+        attrMap.put("Course2", new String[]{"Taken", "None"});
+        attrMap.put("Course3", new String[]{"Taken", "None"});
+        attrMap.put("Course4", new String[]{"Taken", "None"});
+        attrMap.put("Course5", new String[]{"Taken", "None"});
+        attrMap.put("Course6", new String[]{"Taken", "None"});
+        attrMap.put("Course7", new String[]{"Taken", "None"});
+        attrMap.put("Course8", new String[]{"Taken", "None"});
+
+        AprioriEngine engine = new AprioriEngine("course-data", attrMap, null);
+        String [] dataarray= engine.Run().split("\n");
+        System.out.println(dataarray.toString());
+
+
+        return ResponseEntity.ok(new ResponseMessage<String[]>(dataarray));
+    }
     /*
     export interface Assign {
         CourseId:number;

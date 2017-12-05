@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @SpringBootApplication
-
+@ComponentScan("com.dublabs")
 @EnableJpaRepositories("com.dublabs.Repository")
 public class VerifydemoApplication  extends SpringBootServletInitializer {
 

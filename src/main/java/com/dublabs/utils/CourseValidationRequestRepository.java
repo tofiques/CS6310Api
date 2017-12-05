@@ -20,13 +20,14 @@ import com.dublabs.Repository.PreReqRepo;
 
 import com.dublabs.Repository.RequestRepo;
 import com.dublabs.Repository.StudentsRepo;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author jineshk
  *
  */
-
+@Component
 public class CourseValidationRequestRepository {
 
 	/*private CourseManagerContex _contex;
@@ -34,7 +35,7 @@ public class CourseValidationRequestRepository {
 	private CourseRepository courseRepository;*/
 	
 	
-	 @Autowired
+	 	@Autowired
 	    JdbcTemplate jdbcTemplate;
 
 	    @Autowired

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface StudentsRepo extends CrudRepository <StudentsEntity,Long> {
+
 	@Query("SELECT   p from StudentsEntity p where p.studentId = :studentId")
 	StudentsEntity findByStudentId(@Param("studentId")Integer studentId); 
 }

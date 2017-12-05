@@ -73,11 +73,11 @@ public class Scratchpad {
             String line = "";
          // Create the file reader
             // Tofique local reader uncomment the below line 
-          // fileReader = new BufferedReader(new FileReader(fileToParse));
+          fileReader = new BufferedReader(new FileReader(fileToParse));
            // Toufiq local work reader comment the below line 
-           ClassPathResource cpr = new ClassPathResource("./"+fileToParse);
-           InputStream is = cpr.getInputStream();
-           fileReader = new BufferedReader(new InputStreamReader(is));
+           //ClassPathResource cpr = new ClassPathResource("./"+fileToParse);
+           //InputStream is = cpr.getInputStream();
+           //fileReader = new BufferedReader(new InputStreamReader(is));
            /// comment till here
            
             // Read the file line by line
