@@ -71,6 +71,7 @@ public class IndexController {
         requestRepo.deleteAll();
         academicRecordsEntityRepo.deleteAll();
         termRepo.deleteAll();
+        instructorReassignmentRepo.deleteAll();
 
         ArrayList<CoursesEntity> coursesEntities;
         ArrayList<InstructorsEntity> instructorsEntities;
